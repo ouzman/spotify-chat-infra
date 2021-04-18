@@ -19,7 +19,7 @@ const routeHandlers = {
     'GET /callback': async ({ event }) => {
         const { data: tokenInfo } = await getToken({
             requestUrl: getRequestUrl({ event }),
-            callbackUri = generateCallbackUrl({ event }),
+            callbackUri: generateCallbackUrl({ event }),
         });
 
         log({ tokenInfo });
