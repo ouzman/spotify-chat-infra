@@ -5,6 +5,11 @@ info:
 paths:
   /login:
     get:
+      x-amazon-apigateway-integration:
+        type: "AWS_PROXY"
+        httpMethod: "POST"
+        uri: "${integrationInvokeArn}"
+        payloadFormatVersion: "1.0"
       summary: Initialize the login
       responses:
         '302':
@@ -16,6 +21,11 @@ paths:
               description: Redirect URL of Spotify OAuth2 authorization
   /callback:
     get:
+      x-amazon-apigateway-integration:
+        type: "AWS_PROXY"
+        httpMethod: "POST"
+        uri: "${integrationInvokeArn}"
+        payloadFormatVersion: "1.0"
       summary: Callback endpoint for Spotify OAuth2 authorization code flow
       parameters:
         - in: query
