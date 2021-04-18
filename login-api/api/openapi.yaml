@@ -1,0 +1,34 @@
+openapi: 3.0.0
+info:
+  title: spotify-chat-login-api
+  version: 1.0.0
+paths:
+  /login:
+    get:
+      summary: Initialize the login
+      responses:
+        '302':
+          description: Redirect to Spotify OAuth2 Authorization
+          headers:
+            Location:
+              schema: 
+                type: string
+              description: Redirect URL of Spotify OAuth2 authorization
+  /callback:
+    get:
+      summary: Callback endpoint for Spotify OAuth2 authorization code flow
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: state
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfull login callback
+        '5XX':
+          description: Unsuccessfull login callback

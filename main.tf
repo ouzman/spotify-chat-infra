@@ -17,3 +17,7 @@ provider "archive" {}
 module "auth_lambda" {
   source = "./auth-lambda"
 }
+
+module "login_api" {
+  source = "./login-api"
+}

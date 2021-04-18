@@ -60,7 +60,7 @@ EOF
 }
 
 resource "aws_lambda_function" "auth_lambda" {
-  function_name = "auth-lambda"
+  function_name = "spotify-chat-auth-lambda"
   role          = aws_iam_role.auth_lambda_role.arn
   handler       = "auth-lambda.handler"
   
