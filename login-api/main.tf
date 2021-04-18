@@ -27,14 +27,14 @@ resource "aws_lambda_permission" "auth_lambda_permission" {
   source_arn = "${aws_apigatewayv2_api.login_api.execution_arn}/*/*"
 }
 
-resource "aws_apigatewayv2_route" "example" {
+resource "aws_apigatewayv2_route" "login_route_integration_attachment" {
   api_id    = aws_apigatewayv2_api.login_api.id
   route_key = "GET /login"
 
   target = "integrations/${aws_apigatewayv2_integration.auth_lambda_integration.id}"
 }
 
-resource "aws_apigatewayv2_route" "example" {
+resource "aws_apigatewayv2_route" "callback_route_integration_attachment" {
   api_id    = aws_apigatewayv2_api.login_api.id
   route_key = "GET /callback"
 
