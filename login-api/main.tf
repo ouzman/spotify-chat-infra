@@ -18,3 +18,21 @@ resource "aws_lambda_permission" "auth_lambda_permission" {
   # within the API Gateway REST API.
   source_arn = "${aws_apigatewayv2_api.login_api.execution_arn}/*/*"
 }
+
+resource "aws_apigatewayv2_stage" "default_stage" {
+  api_id = aws_apigatewayv2_api.login_api.id
+  name   = "$default"
+}
+
+resource "aws_apigatewayv2_deployment" "default_deployment" {
+  api_id      = aws_apigatewayv2_api.login_api.id
+  description = "Default deployment"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  depends_on = [
+    aws_apigatewayv2_api.login_api,
+  ]
+}
