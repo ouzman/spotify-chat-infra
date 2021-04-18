@@ -16,7 +16,7 @@ const routeHandlers = {
             statusCode: 302,
             headers: {
                 'location': spotifyAuth.code.getUri({
-                    redirectUri: `https://${event.requestContext.domainName}/callback/`
+                    redirectUri: `https://${event.requestContext.domainName}/callback`
                 }),
             },
         }
