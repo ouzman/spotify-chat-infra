@@ -69,6 +69,12 @@ resource "aws_lambda_function" "auth_lambda" {
 
   runtime = "nodejs12.x"
 
+  environment {
+    variables = {
+      SPOTIFY_CLIENT_ID = var.spotify_client_id,
+      SPOTIFY_CLIENT_SECRET = var.spotify_client_secret
+    }
+  }
   tags = {
     project = "spotify-chat"
   }

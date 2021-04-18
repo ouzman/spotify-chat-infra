@@ -16,6 +16,8 @@ provider "archive" {}
 
 module "auth_lambda" {
   source = "./auth-lambda"
+  spotify_client_id     = var.spotify_client_id
+  spotify_client_secret = var.spotify_client_secret
 }
 
 module "login_api" {
