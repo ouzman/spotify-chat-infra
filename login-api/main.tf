@@ -28,6 +28,15 @@ resource "aws_apigatewayv2_deployment" "default_deployment" {
   api_id      = aws_apigatewayv2_api.login_api.id
   description = "Default deployment"
 
+  triggers = {
+    redeployment = sha1(
+        join(",", 
+            list(jsonencode(aws_apigatewayv2_api.login_api), 
+            var.auth_lambda_invoke_arn, 
+            file("${path.module}/api/openapi.yaml"),
+    )))
+  }
+
   lifecycle {
     create_before_destroy = true
   }
