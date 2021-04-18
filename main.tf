@@ -11,3 +11,9 @@ provider "aws" {
   profile = "default"
   region  = var.region
 }
+
+provider "archive" {}
+
+module "auth_lambda" {
+  source = "./auth-lambda"
+}

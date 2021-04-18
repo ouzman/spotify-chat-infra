@@ -85,3 +85,5 @@ override.tf.json
 *.code-workspace
 
 # End of https://www.toptal.com/developers/gitignore/api/terraform,macos,vscode,git
+
+*/js/dist/*
