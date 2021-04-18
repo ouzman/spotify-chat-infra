@@ -22,6 +22,9 @@ resource "aws_iam_role" "auth_lambda_role" {
   ]
 }
 EOF
+  tags = {
+    project = "spotify-chat"
+  }
 }
 
 resource "aws_iam_role_policy" "auth_lambda_policy" {
@@ -54,6 +57,9 @@ resource "aws_iam_role_policy" "auth_lambda_policy" {
   ]
 }
 EOF
+  tags = {
+    project = "spotify-chat"
+  }
 }
 
 resource "aws_lambda_function" "auth_lambda" {
@@ -65,4 +71,8 @@ resource "aws_lambda_function" "auth_lambda" {
   source_code_hash = data.archive_file.auth_lambda_archive.output_base64sha256
 
   runtime = "nodejs12.x"
+
+  tags = {
+    project = "spotify-chat"
+  }
 }
