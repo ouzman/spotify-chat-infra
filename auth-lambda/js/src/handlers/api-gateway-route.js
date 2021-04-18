@@ -1,50 +1,36 @@
 const { log } = require('../util');
+const { 
+    getAuthorizeUrl,
+    getToken,
+} = require('../spotify-authorizer');
 
-const ClientOAuth2 = require('client-oauth2')
-
-const spotifyAuth = new ClientOAuth2({
-  clientId: process.env.SPOTIFY_CLIENT_ID,
-  clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-  accessTokenUri: 'https://accounts.spotify.com/api/token',
-  authorizationUri: 'https://accounts.spotify.com/authorize',
-  scopes: ['user-read-email', 'user-read-private'],
-})
-
-const getRedirectUri = ({ event }) => `https://${event.requestContext.domainName}/callback`
+const generateCallbackUrl = ({ event }) => `https://${event.requestContext.domainName}/callback`
+const getRequestUrl = ({ event }) => `https://${event.requestContext.domainName}${event.rawPath}?${event.rawQueryString}`
 
 const routeHandlers = {
-    'GET /login': ({ event }) => {
+    'GET /login': async ({ event }) => {
         return {
             statusCode: 302,
             headers: {
-                'location': spotifyAuth.code.getUri({
-                    redirectUri: getRedirectUri({ event })
-                }),
+                'location': getAuthorizeUrl({ callbackUrl: generateCallbackUrl({ event }) }),
             },
         }
     },
-    'GET /callback': ({ event }) => {
-        const { rawQueryString } = event;
-
-        return spotifyAuth.code.getToken({
-            pathname: '/callback',
-            search: `?${rawQueryString}`, 
-        }, {
-            redirectUri: getRedirectUri({ event })
-        })
-        .then(user => {
-            log({ user });
-            return user;
-        })
-        .then(user => {
-            return {
-                statusCode: 200,
-                body: 'done',
-                headers: {
-                    'content-type': 'text/plain'
-                }
-            }    
+    'GET /callback': async ({ event }) => {
+        const { data: tokenInfo } = await getToken({
+            requestUrl: getRequestUrl({ event }),
+            callbackUri = generateCallbackUrl({ event }),
         });
+
+        log({ tokenInfo });
+
+        return {
+            statusCode: 200,
+            body: 'done',
+            headers: {
+                'content-type': 'text/plain'
+            }
+        }    
     }
 }
 
