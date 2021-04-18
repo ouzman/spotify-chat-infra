@@ -26,7 +26,7 @@ EOF
 
 resource "aws_iam_role_policy" "auth_lambda_policy" {
   name        = "spotify_chat_auth_lambda_policy"
-  role        =  aws_iam_role.share_lambda_role.id
+  role        =  aws_iam_role.auth_lambda_role.id
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -58,7 +58,7 @@ EOF
 
 resource "aws_lambda_function" "auth_lambda" {
   function_name = "auth-lambda"
-  role          = aws_iam_role.share_lambda_role.arn
+  role          = aws_iam_role.auth_lambda_role.arn
   handler       = "auth-lambda.handler"
   
   filename      = "${path.module}/js/dist/auth-lambda.zip"
