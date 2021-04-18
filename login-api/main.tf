@@ -1,7 +1,8 @@
 resource "aws_apigatewayv2_api" "login_api" {
-  name          = "spotify-chat-login-api"
-  protocol_type = "HTTP"
-  body          = templatefile("${path.module}/api/openapi.yaml", { integrationInvokeArn: var.auth_lambda_arn })
+  name              = "spotify-chat-login-api"
+  protocol_type     = "HTTP"
+  body              = templatefile("${path.module}/api/openapi.yaml", { integrationInvokeArn: var.auth_lambda_arn })
+  fail_on_warnings  = true
 
   tags = {
     project = "spotify-chat"
@@ -20,8 +21,10 @@ resource "aws_lambda_permission" "auth_lambda_permission" {
 }
 
 resource "aws_apigatewayv2_stage" "default_stage" {
-  api_id = aws_apigatewayv2_api.login_api.id
-  name   = "$default"
+  api_id        = aws_apigatewayv2_api.login_api.id
+  name          = "$default"
+  deployment_id = aws_apigatewayv2_deployment.default_deployment.id
+  auto_deploy   = true
 }
 
 resource "aws_apigatewayv2_deployment" "default_deployment" {

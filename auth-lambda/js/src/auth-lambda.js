@@ -6,7 +6,7 @@ function handlerFactory({ event }) {
     if (!!event.routeKey) {
         return apiGatewayRouteHandler({ event });
     } else if (!!event.eventType) {
-        return invokeLambdaHandler({ event });
+        return lambdaInvokeHandler({ event });
     }
 }
 
