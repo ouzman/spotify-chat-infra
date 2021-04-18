@@ -1,4 +1,4 @@
-variable "auth_lambda_invoke_arn" {
+variable "auth_lambda_arn" {
     type = string
 }
 

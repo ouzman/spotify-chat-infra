@@ -1,7 +1,7 @@
 resource "aws_apigatewayv2_api" "login_api" {
   name          = "spotify-chat-login-api"
   protocol_type = "HTTP"
-  body          = templatefile("${path.module}/api/openapi.yaml", { integrationInvokeArn: var.auth_lambda_invoke_arn })
+  body          = templatefile("${path.module}/api/openapi.yaml", { integrationInvokeArn: var.auth_lambda_arn })
 
   tags = {
     project = "spotify-chat"
@@ -32,7 +32,7 @@ resource "aws_apigatewayv2_deployment" "default_deployment" {
     redeployment = sha1(
         join(",", 
             list(jsonencode(aws_apigatewayv2_api.login_api), 
-            var.auth_lambda_invoke_arn, 
+            var.auth_lambda_arn, 
             file("${path.module}/api/openapi.yaml"),
     )))
   }

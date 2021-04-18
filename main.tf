@@ -20,6 +20,6 @@ module "auth_lambda" {
 
 module "login_api" {
   source                    = "./login-api"
-  auth_lambda_invoke_arn    = module.auth_lambda.auth_lambda_invoke_arn
+  auth_lambda_arn           = module.auth_lambda.auth_lambda_arn
   auth_lambda_function_name = module.auth_lambda.auth_lambda_function_name
 }
