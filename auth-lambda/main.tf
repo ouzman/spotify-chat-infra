@@ -57,9 +57,6 @@ resource "aws_iam_role_policy" "auth_lambda_policy" {
   ]
 }
 EOF
-  tags = {
-    project = "spotify-chat"
-  }
 }
 
 resource "aws_lambda_function" "auth_lambda" {
