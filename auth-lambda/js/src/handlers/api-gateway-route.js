@@ -10,13 +10,15 @@ const spotifyAuth = new ClientOAuth2({
   scopes: ['user-read-email', 'user-read-private'],
 })
 
+const getRedirectUri = ({ event }) => `https://${event.requestContext.domainName}/callback`
+
 const routeHandlers = {
     'GET /login': ({ event }) => {
         return {
             statusCode: 302,
             headers: {
                 'location': spotifyAuth.code.getUri({
-                    redirectUri: `https://${event.requestContext.domainName}/callback`
+                    redirectUri: getRedirectUri({ event })
                 }),
             },
         }
@@ -27,6 +29,8 @@ const routeHandlers = {
         return spotifyAuth.code.getToken({
             pathname: '/callback',
             search: `?${rawQueryString}`, 
+        }, {
+            redirectUri: getRedirectUri({ event })
         })
         .then(user => {
             log({ user });
