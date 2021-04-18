@@ -12,7 +12,7 @@ const routeHandlers = {
         return {
             statusCode: 302,
             headers: {
-                'location': getAuthorizeUrl({ callbackUrl: generateCallbackUrl({ event }) }),
+                'location': await getAuthorizeUrl({ callbackUrl: generateCallbackUrl({ event }) }),
             },
         }
     },
