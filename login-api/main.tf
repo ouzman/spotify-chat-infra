@@ -26,3 +26,17 @@ resource "aws_lambda_permission" "auth_lambda_permission" {
   # within the API Gateway REST API.
   source_arn = "${aws_apigatewayv2_api.login_api.execution_arn}/*/*"
 }
+
+resource "aws_apigatewayv2_route" "example" {
+  api_id    = aws_apigatewayv2_api.login_api.id
+  route_key = "GET /login"
+
+  target = "integrations/${aws_apigatewayv2_integration.auth_lambda_integration.id}"
+}
+
+resource "aws_apigatewayv2_route" "example" {
+  api_id    = aws_apigatewayv2_api.login_api.id
+  route_key = "GET /callback"
+
+  target = "integrations/${aws_apigatewayv2_integration.auth_lambda_integration.id}"
+}
