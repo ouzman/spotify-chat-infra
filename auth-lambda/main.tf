@@ -36,12 +36,18 @@ resource "aws_iam_role_policy" "auth_lambda_policy" {
   "Statement": [
     {
       "Action": [
-          "logs:CreateLogStream",
-          "logs:CreateLogGroup",
-          "logs:PutLogEvents"
+          "dynamodb:PutItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:GetItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:Scan",
+          "dynamodb:Query",
       ],
       "Resource": [
-          "arn:aws:logs:*:*:*"
+          "${var.users_db_table_arn}",
+          "${var.users_db_table_arn}/index/*",
+          "${var.api_keys_db_table_arn}",
+          "${var.api_keys_db_table_arn}/index/*",
       ],
       "Effect": "Allow"
     },
@@ -72,7 +78,9 @@ resource "aws_lambda_function" "auth_lambda" {
   environment {
     variables = {
       SPOTIFY_CLIENT_ID = var.spotify_client_id,
-      SPOTIFY_CLIENT_SECRET = var.spotify_client_secret
+      SPOTIFY_CLIENT_SECRET = var.spotify_client_secret,
+      USERS_DB_TABLE_NAME = var.users_db_table_name,
+      API_KEYS_DB_TABLE_NAME = var.api_keys_db_table_name
     }
   }
   tags = {
