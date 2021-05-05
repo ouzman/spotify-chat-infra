@@ -41,13 +41,13 @@ resource "aws_iam_role_policy" "auth_lambda_policy" {
           "dynamodb:GetItem",
           "dynamodb:UpdateItem",
           "dynamodb:Scan",
-          "dynamodb:Query",
+          "dynamodb:Query"
       ],
       "Resource": [
           "${var.users_db_table_arn}",
           "${var.users_db_table_arn}/index/*",
           "${var.api_keys_db_table_arn}",
-          "${var.api_keys_db_table_arn}/index/*",
+          "${var.api_keys_db_table_arn}/index/*"
       ],
       "Effect": "Allow"
     },
