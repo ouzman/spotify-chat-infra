@@ -9,24 +9,4 @@ resource "aws_dynamodb_table" "users" {
     name = "SpotifyUri"
     type = "S"
   }
-
-  attribute {
-    name = "DisplayName"
-    type = "S"
-  }
-
-  attribute {
-    name = "ImageUrl"
-    type = "S"
-  }
-
-  attribute {
-    name = "AccessToken"
-    type = "S"
-  }
-
-  attribute {
-    name = "RefreshToken"
-    type = "S"
-  }
 }

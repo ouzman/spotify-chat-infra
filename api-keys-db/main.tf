@@ -9,9 +9,4 @@ resource "aws_dynamodb_table" "api_keys" {
     name = "ApiKey"
     type = "S"
   }
-
-  attribute {
-    name = "SpotifyUri"
-    type = "S"
-  }
 }
