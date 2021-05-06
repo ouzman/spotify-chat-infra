@@ -19,6 +19,3 @@ exports.getUserInfo = async ({ accessToken }) => {
         .then(event => event.Payload)
         .then(payload => JSON.parse(payload));
 }
-
-
-
