@@ -41,7 +41,7 @@ exports.deleteByApiKey = async ({ apiKey }) => {
 }
 
 function generateApiKey({ user }) {
-    return scrypto.createHash('sha256')
+    return crypto.createHash('sha256')
         .update(`spotifychat-salt:${user.AccessToken}:${user.RefreshToken}`)
         .digest('hex');
 }
