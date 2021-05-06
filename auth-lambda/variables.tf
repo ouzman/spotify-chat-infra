@@ -25,3 +25,7 @@ variable "api_keys_db_table_name" {
 variable "spotify_lambda_arn" {
     type = string
 }
+
+variable "spotify_lambda_function_name" {
+    type = string
+}

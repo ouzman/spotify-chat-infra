@@ -3,6 +3,9 @@ const {
     getAuthorizeUrl,
     getToken,
 } = require('../spotify-authorizer');
+const {
+    getUserInfo
+} = require('../data-source/spotify')
 
 const generateCallbackUrl = ({ event }) => `https://${event.requestContext.domainName}/callback`
 const getRequestUrl = ({ event }) => `https://${event.requestContext.domainName}${event.rawPath}?${event.rawQueryString}`
@@ -23,6 +26,10 @@ const routeHandlers = {
         });
 
         log({ tokenInfo });
+        
+        const spotifyUser = await getUserInfo({ accessToken: tokenInfo['access_token'] });
+
+        log({ spotifyUser });
 
         return {
             statusCode: 200,
