@@ -22,7 +22,8 @@ exports.createUser = async ({ tokenInfo, spotifyUser }) => {
             ':refreshToken': tokenInfo['refresh_token'],
         },
         ReturnValues: 'ALL_NEW'
-    }).promise();
+    }).promise()
+        .then(res => res.Attributes);
 }
 
 exports.getBySpotifyUri = async ({ spotifyUri }) => {

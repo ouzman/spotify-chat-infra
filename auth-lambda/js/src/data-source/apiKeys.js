@@ -18,7 +18,8 @@ exports.createApiKey = async ({ user }) => {
             ':spotifyUri': user.SpotifyUri
         },
         ReturnValues: 'ALL_NEW'
-    }).promise();
+    }).promise()
+        .then(res => res.Attributes);
 }
 
 exports.getByApiKey = async ({ apiKey }) => {

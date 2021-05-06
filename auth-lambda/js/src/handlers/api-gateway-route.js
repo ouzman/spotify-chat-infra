@@ -56,14 +56,19 @@ async function spotifyAuthSuccess({ event, tokenInfo }) {
 
     log({ user });
 
-    return success();
+    const { apiKey: ApiKey } = await createApiKey({ user });
+
+    log({ apiKey });
+
+    return apiKeyResponse({ apiKey });
 }
 
-function success() {
+function apiKeyResponse({ apiKey }) {
     return {
         statusCode: 200,
         body: JSON.stringify({
-            message: 'done'
+            message: 'done',
+            apiKey
         }),
         headers: {
             'content-type': 'application/json'
