@@ -13,11 +13,11 @@ exports.getUserInfo = async ({ accessToken }) => {
     };
 
     return lambda.invoke({
-        FunctionName: FUNCTION_NAME, 
+        FunctionName: FUNCTION_NAME,
         Payload: JSON.stringify(payload)
-    }).promise();
+    }).promise()
+        .then(event => event.Payload);
 }
 
 
 
-    

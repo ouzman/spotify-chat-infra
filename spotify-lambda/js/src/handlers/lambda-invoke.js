@@ -31,7 +31,7 @@ const eventHandlers = {
             return errorResponse({ event, request, response: responseBody })
         }
 
-        const eventPayload = {
+        const spotifyUser = {
             uri: responseBody['uri'],
             displayName: responseBody['display_name'],
             image: responseBody['images'] && responseBody['images'][0] && responseBody['images'][0]['url'] || null,
@@ -39,7 +39,9 @@ const eventHandlers = {
 
         return {
             status: 0,
-            payload: eventPayload,
+            context: {
+                spotifyUser 
+            }
         }
     },  
 }

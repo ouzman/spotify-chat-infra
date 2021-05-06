@@ -43,10 +43,10 @@ async function spotifyAuthSuccess({ event, tokenInfo }) {
     log({ spotifyUserResponse });
 
     if (spotifyUserResponse.status !== 0) {
-        return businessError({ event, errorMessage: spotifyUserResponse.payload.errorMessage })
+        return businessError({ event, errorMessage: spotifyUserResponse.errorMessage })
     }
 
-    const spotifyUser = spotifyUserResponse.payload;
+    const { spotifyUser } = spotifyUserResponse.context;
 
     const user = await createUser({ tokenInfo, spotifyUser });
 
