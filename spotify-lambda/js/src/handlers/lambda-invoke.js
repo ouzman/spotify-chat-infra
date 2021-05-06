@@ -27,7 +27,7 @@ const eventHandlers = {
 
         log({ responseBody });
 
-        if (response.ok() === false) {
+        if (response.ok === false) {
             return errorResponse({ event, request, response: responseBody })
         }
 
