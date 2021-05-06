@@ -1,16 +1,15 @@
 const fetch = require('node-fetch');
 const Request = require('node-fetch').Request;
-var fetchAbsolute = require('fetch-absolute');
 
 const { log } = require('../util');
 
-const spotifyApi = fetchAbsolute(fetch)('https://api.spotify.com');
+const SPOTIFY_BASE_URI = 'https://api.spotify.com';
 
 const eventHandlers = {
     'getUserInfo': async ({ event }) => {
         const { accessToken } = event.payload;
 
-        const request = new Request('/v1/me', {
+        const request = new Request(`${SPOTIFY_BASE_URI}/v1/me`, {
             method: 'GET',
             headers: {
                 authorization: `Bearer ${accessToken}`,
@@ -19,7 +18,7 @@ const eventHandlers = {
 
         let response;
         try {
-            response = await spotifyApi(request);    
+            response = await fetch(request);    
         } catch (error) {
             return networkError({ event, error });
         }
