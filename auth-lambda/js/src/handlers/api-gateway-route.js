@@ -1,11 +1,17 @@
 const { log } = require('../util');
+
 const { 
     getAuthorizeUrl,
     getToken,
 } = require('../spotify-authorizer');
+
 const {
     getUserInfo
 } = require('../data-source/spotify')
+
+const {
+    createUser
+} = require('../data-source/users');
 
 const generateCallbackUrl = ({ event }) => `https://${event.requestContext.domainName}/callback`
 const getRequestUrl = ({ event }) => `https://${event.requestContext.domainName}${event.rawPath}?${event.rawQueryString}`
@@ -26,25 +32,62 @@ const routeHandlers = {
         });
 
         log({ tokenInfo });
-        
-        const spotifyUser = await getUserInfo({ accessToken: tokenInfo['access_token'] });
 
-        log({ spotifyUser });
+        return spotifyAuthSuccess({ event, tokenInfo });
+    }
+}
 
-        return {
-            statusCode: 200,
-            body: 'done',
-            headers: {
-                'content-type': 'text/plain'
-            }
-        }    
+async function spotifyAuthSuccess({ event, tokenInfo }) {
+    const spotifyUserResponse = await getUserInfo({ accessToken: tokenInfo['access_token'] });
+
+    log({ spotifyUserResponse });
+
+    if (spotifyUserResponse.status !== 0) {
+        return businessError({ event, errorMessage: spotifyUserResponse.payload.errorMessage })
+    }
+
+    const spotifyUser = spotifyUserResponse.payload;
+
+    const user = await createUser({ tokenInfo, spotifyUser });
+
+    log({ user });
+
+    return success();
+}
+
+function success() {
+    return {
+        statusCode: 200,
+        body: {
+            message: 'done'
+        },
+        headers: {
+            'content-type': 'application/json'
+        }
+    };
+}
+
+function businessError({ event, errorMessage }) {
+    return {
+        status: 400,
+        body: {
+            message: errorMessage
+        },
+        headers: {
+            'content-type': 'application/json'
+        }
     }
 }
 
 function unknown({ event }) {
     return {
         status: 404,
-        body: "Not found"
+        body: {
+            message: 'Not found',
+        },
+        headers: {
+            'content-type': 'application/json'
+        }
     }
 }
 
