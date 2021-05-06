@@ -16,7 +16,8 @@ exports.getUserInfo = async ({ accessToken }) => {
         FunctionName: FUNCTION_NAME,
         Payload: JSON.stringify(payload)
     }).promise()
-        .then(event => event.Payload);
+        .then(event => event.Payload)
+        .then(payload => JSON.parse(payload));
 }
 
 

@@ -58,9 +58,9 @@ async function spotifyAuthSuccess({ event, tokenInfo }) {
 function success() {
     return {
         statusCode: 200,
-        body: {
+        body: JSON.stringify({
             message: 'done'
-        },
+        }),
         headers: {
             'content-type': 'application/json'
         }
@@ -70,9 +70,9 @@ function success() {
 function businessError({ event, errorMessage }) {
     return {
         status: 400,
-        body: {
+        body: JSON.stringify({
             message: errorMessage
-        },
+        }),
         headers: {
             'content-type': 'application/json'
         }
@@ -82,9 +82,9 @@ function businessError({ event, errorMessage }) {
 function unknown({ event }) {
     return {
         status: 404,
-        body: {
+        body: JSON.stringify({
             message: 'Not found',
-        },
+        }),
         headers: {
             'content-type': 'application/json'
         }
