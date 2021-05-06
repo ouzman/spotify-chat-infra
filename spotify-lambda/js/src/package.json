@@ -1,0 +1,15 @@
+{
+  "name": "spotify-lambda",
+  "version": "1.0.0",
+  "description": "",
+  "main": "spotify-lambda.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fetch-absolute": "^1.0.0",
+    "node-fetch": "^2.6.1"
+  }
+}

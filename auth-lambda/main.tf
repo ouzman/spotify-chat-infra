@@ -36,6 +36,15 @@ resource "aws_iam_role_policy" "auth_lambda_policy" {
   "Statement": [
     {
       "Action": [
+          "lambda:InvokeFunction"
+      ],
+      "Resource": [
+          "${var.spotify_lambda_arn}"
+      ],
+      "Effect": "Allow"
+    },
+    {
+      "Action": [
           "dynamodb:PutItem",
           "dynamodb:DeleteItem",
           "dynamodb:GetItem",
