@@ -13,6 +13,10 @@ const {
     createUser
 } = require('../data-source/users');
 
+const {
+    createApiKey
+} = require('../data-source/apiKeys');
+
 const generateCallbackUrl = ({ event }) => `https://${event.requestContext.domainName}/callback`
 const getRequestUrl = ({ event }) => `https://${event.requestContext.domainName}${event.rawPath}?${event.rawQueryString}`
 

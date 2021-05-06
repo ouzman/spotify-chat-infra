@@ -17,7 +17,7 @@ exports.createApiKey = async ({ user }) => {
         ExpressionAttributeValues: {
             ':spotifyUri': user.SpotifyUri
         },
-        ReturnValues: "UPDATED_NEW"
+        ReturnValues: 'ALL_NEW'
     }).promise();
 }
 
