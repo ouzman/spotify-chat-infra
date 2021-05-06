@@ -44,8 +44,7 @@ const eventHandlers = {
     },  
 }
 
-async function errorResponse({ event, request, response }) {
-    const jsonResponse = await response.json()
+function errorResponse({ event, request, response }) {
     return {
         status: response.error.status,
         errorMessage: response.error.message,
