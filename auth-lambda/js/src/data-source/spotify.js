@@ -14,8 +14,7 @@ exports.getUserInfo = async ({ accessToken }) => {
 
     return lambda.invoke({
         FunctionName: FUNCTION_NAME, 
-        Payload: JSON.stringify(payload), 
-        Qualifier: "1"
+        Payload: JSON.stringify(payload)
     }).promise();
 }
 
