@@ -1,19 +1,10 @@
 const { log } = require('./util');
-const { handler: apiGatewayRouteHandler } = require('./handlers/api-gateway-route');
-const { handler: lambdaInvokeHandler } = require('./handlers/lambda-invoke');
-
-async function handlerFactory({ event }) {
-    if (!!event.routeKey) {
-        return apiGatewayRouteHandler({ event });
-    } else if (!!event.eventType) {
-        return lambdaInvokeHandler({ event });
-    }
-}
+const { handler: apiGatewayRouteHandler } = require('./api-gateway-routes');
 
 exports.handler = async (event, context) => {
     log({ event, context });
 
-    const handler = await handlerFactory({ event });
+    const handler = await apiGatewayRouteHandler({ event });
 
     return handler({ event });
 };

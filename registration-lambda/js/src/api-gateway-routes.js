@@ -1,21 +1,21 @@
-const { log } = require('../util');
+const { log } = require('./util');
 
 const { 
     getAuthorizeUrl,
     getToken,
-} = require('../spotify-authorizer');
+} = require('./spotify-authorizer');
 
 const {
     getUserInfo
-} = require('../data-source/spotify')
+} = require('./data-source/spotify')
 
 const {
     createUser
-} = require('../data-source/users');
+} = require('./data-source/users');
 
 const {
     createApiKey
-} = require('../data-source/apiKeys');
+} = require('./data-source/apiKeys');
 
 const generateCallbackUrl = ({ event }) => `https://${event.requestContext.domainName}/callback`
 const getRequestUrl = ({ event }) => `https://${event.requestContext.domainName}${event.rawPath}?${event.rawQueryString}`
@@ -101,7 +101,7 @@ function unknown({ event }) {
 }
 
 exports.handler = async ({ event }) => {
-    const { routeKey } = event;
+    const { resourceId } = event.requestContext;
 
-    return routeHandlers[routeKey] || unknown;
+    return routeHandlers[resourceId] || unknown;
 };
