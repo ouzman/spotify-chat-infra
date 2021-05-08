@@ -9,7 +9,7 @@ paths:
         type: "AWS_PROXY"
         httpMethod: "POST"
         uri: "${integrationInvokeArn}"
-        payloadFormatVersion: "1.0"
+        payloadFormatVersion: "2.0"
       summary: Initialize the login
       responses:
         '302':
@@ -25,7 +25,7 @@ paths:
         type: "AWS_PROXY"
         httpMethod: "POST"
         uri: "${integrationInvokeArn}"
-        payloadFormatVersion: "1.0"
+        payloadFormatVersion: "2.0"
       summary: Callback endpoint for Spotify OAuth2 authorization code flow
       parameters:
         - in: query

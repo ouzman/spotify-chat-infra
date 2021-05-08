@@ -101,7 +101,7 @@ function unknown({ event }) {
 }
 
 exports.handler = async ({ event }) => {
-    const { resourceId } = event.requestContext;
+    const { routeKey } = event;
 
-    return routeHandlers[resourceId] || unknown;
+    return routeHandlers[routeKey] || unknown;
 };
