@@ -1,8 +1,8 @@
 {
-  "name": "spotify-chat-auth-lambda",
+  "name": "spotify-chat-registration-lambda",
   "version": "1.0.0",
   "description": "",
-  "main": "auth-lambda.js",
+  "main": "registration-lambda.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

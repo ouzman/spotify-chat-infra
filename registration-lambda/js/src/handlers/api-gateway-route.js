@@ -56,7 +56,7 @@ async function spotifyAuthSuccess({ event, tokenInfo }) {
 
     log({ user });
 
-    const { ApiKey: apiKey  } = await createApiKey({ user });
+    const { ApiKey: apiKey } = await createApiKey({ user });
 
     log({ apiKey });
 

@@ -1,11 +1,11 @@
-data "archive_file" "auth_lambda_archive" {
+data "archive_file" "registration_lambda_archive" {
   type        = "zip"
   source_dir = "${path.module}/js/src"
-  output_path = "${path.module}/js/dist/auth-lambda.zip"
+  output_path = "${path.module}/js/dist/registration-lambda.zip"
 }
 
-resource "aws_iam_role" "auth_lambda_role" {
-  name = "spotify_chat_auth_lambda_role"
+resource "aws_iam_role" "registration_lambda_role" {
+  name = "spotify_chat_registration_lambda_role"
 
   assume_role_policy = <<EOF
 {
@@ -27,9 +27,9 @@ EOF
   }
 }
 
-resource "aws_iam_role_policy" "auth_lambda_policy" {
-  name        = "spotify_chat_auth_lambda_policy"
-  role        =  aws_iam_role.auth_lambda_role.id
+resource "aws_iam_role_policy" "registration_lambda_policy" {
+  name        = "spotify_chat_registration_lambda_policy"
+  role        =  aws_iam_role.registration_lambda_role.id
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -74,13 +74,13 @@ resource "aws_iam_role_policy" "auth_lambda_policy" {
 EOF
 }
 
-resource "aws_lambda_function" "auth_lambda" {
-  function_name = "spotify-chat-auth-lambda"
-  role          = aws_iam_role.auth_lambda_role.arn
-  handler       = "auth-lambda.handler"
+resource "aws_lambda_function" "registration_lambda" {
+  function_name = "spotify-chat-registration-lambda"
+  role          = aws_iam_role.registration_lambda_role.arn
+  handler       = "registration-lambda.handler"
   
-  filename      = "${path.module}/js/dist/auth-lambda.zip"
-  source_code_hash = data.archive_file.auth_lambda_archive.output_base64sha256
+  filename      = "${path.module}/js/dist/registration-lambda.zip"
+  source_code_hash = data.archive_file.registration_lambda_archive.output_base64sha256
 
   runtime = "nodejs12.x"
 

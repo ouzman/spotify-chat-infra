@@ -1,7 +1,7 @@
 resource "aws_apigatewayv2_api" "login_api" {
   name              = "spotify-chat-login-api"
   protocol_type     = "HTTP"
-  body              = templatefile("${path.module}/api/openapi.yaml", { integrationInvokeArn: var.auth_lambda_arn })
+  body              = templatefile("${path.module}/api/openapi.yaml", { integrationInvokeArn: var.registration_lambda_arn })
   fail_on_warnings  = true
 
   tags = {
@@ -9,10 +9,10 @@ resource "aws_apigatewayv2_api" "login_api" {
   }
 }
 
-resource "aws_lambda_permission" "auth_lambda_permission" {
+resource "aws_lambda_permission" "registration_lambda_permission" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = var.auth_lambda_function_name
+  function_name = var.registration_lambda_function_name
   principal     = "apigateway.amazonaws.com"
 
   # The "/*/*" portion grants access from any method on any resource
@@ -35,7 +35,7 @@ resource "aws_apigatewayv2_deployment" "default_deployment" {
     redeployment = sha1(
         join(",", 
             list(jsonencode(aws_apigatewayv2_api.login_api), 
-            var.auth_lambda_arn, 
+            var.registration_lambda_arn, 
             file("${path.module}/api/openapi.yaml"),
     )))
   }

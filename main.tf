@@ -33,8 +33,8 @@ module "spotify_lambda" {
   source = "./spotify-lambda"
 }
 
-module "auth_lambda" {
-  source                        = "./auth-lambda"
+module "registration_lambda" {
+  source                        = "./registration-lambda"
   spotify_client_id             = var.spotify_client_id
   spotify_client_secret         = var.spotify_client_secret
   users_db_table_arn            = module.users_db.users_db_arn
@@ -47,6 +47,6 @@ module "auth_lambda" {
 
 module "login_api" {
   source                    = "./login-api"
-  auth_lambda_arn           = module.auth_lambda.auth_lambda_arn
-  auth_lambda_function_name = module.auth_lambda.auth_lambda_function_name
+  registration_lambda_arn           = module.registration_lambda.registration_lambda_arn
+  registration_lambda_function_name = module.registration_lambda.registration_lambda_function_name
 }
