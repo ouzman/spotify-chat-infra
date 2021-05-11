@@ -33,7 +33,7 @@ resource "aws_iam_role_policy" "api_key_authorizer_lambda_policy" {
   policy = <<EOF
 {
   "Version": "2012-10-17",
-
+  "Statement": [
     {
       "Action": [
           "dynamodb:PutItem",
