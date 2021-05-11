@@ -2,6 +2,8 @@ const { log } = require('./util');
 
 const { getByApiKey } = require('./data-source/api-keys');
 
+const HEADER_NAME = 'X-SC-ApiKey';
+
 const allow = ({ event, spotifyUri, apiKey }) => {
     const { methodArn } = event;
 
@@ -31,9 +33,19 @@ exports.handler = async (event, context) => {
     log({ event, context });
 
     try {
-        const apiKey = event.headers['X-SC-ApiKey'];
+        const apiKey = event.headers[HEADER_NAME];
 
-        const apiKeyDocument = await getByApiKey({ apiKey }); 
+        if (!!apiKey) {
+            throw Error(`Request doesn't have ${HEADER_NAME} header`);
+        }
+
+        const { Item: apiKeyDocument } = await getByApiKey({ apiKey }); 
+        
+        if (!!apiKeyDocument) {
+            throw Error(`Unknown API Key: ${apiKey}`);
+        }
+
+        log({ apiKeyDocument });
     
         const { SpotifyUri: spotifyUri } = apiKeyDocument;
 
