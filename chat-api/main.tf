@@ -15,7 +15,7 @@ resource "aws_apigatewayv2_integration" "chat_lambda_integration" {
   connection_type           = "INTERNET"
   content_handling_strategy = "CONVERT_TO_TEXT"
   integration_method        = "POST"
-  integration_uri           = var.chat_lambda_arn
+  integration_uri           = var.chat_lambda_invoke_arn
   passthrough_behavior      = "WHEN_NO_MATCH"
 }
 
@@ -76,8 +76,12 @@ resource "aws_apigatewayv2_deployment" "default_deployment" {
   triggers = {
     redeployment = sha1(
         join(",", 
-            list(jsonencode(aws_apigatewayv2_api.chat_api), 
-            var.chat_lambda_arn,
+            list(
+                jsonencode(aws_apigatewayv2_api.chat_api), 
+                jsonencode(aws_apigatewayv2_route.connect_route), 
+                jsonencode(aws_apigatewayv2_route.disconnect_route), 
+                jsonencode(aws_apigatewayv2_route.default_route), 
+                var.chat_lambda_invoke_arn,
     )))
   }
 

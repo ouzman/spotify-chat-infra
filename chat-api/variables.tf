@@ -1,4 +1,4 @@
-variable "chat_lambda_arn" {
+variable "chat_lambda_invoke_arn" {
     type = string
 }
 
