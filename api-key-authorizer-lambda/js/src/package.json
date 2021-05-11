@@ -1,0 +1,14 @@
+{
+  "name": "api-key-authorizer-lambda",
+  "version": "1.0.0",
+  "description": "",
+  "main": "api-key-authorizer-lambda.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "client-oauth2": "^4.3.3"
+  }
+}

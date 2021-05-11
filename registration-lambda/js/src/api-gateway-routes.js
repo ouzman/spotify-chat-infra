@@ -1,21 +1,9 @@
 const { log } = require('./util');
 
-const { 
-    getAuthorizeUrl,
-    getToken,
-} = require('./spotify-authorizer');
-
-const {
-    getUserInfo
-} = require('./data-source/spotify')
-
-const {
-    createUser
-} = require('./data-source/users');
-
-const {
-    createApiKey
-} = require('./data-source/apiKeys');
+const { getAuthorizeUrl, getToken } = require('./spotify-authorizer');
+const { getUserInfo } = require('./data-source/spotify')
+const { createUser } = require('./data-source/users');
+const { createApiKey } = require('./data-source/apiKeys');
 
 const generateCallbackUrl = ({ event }) => `https://${event.requestContext.domainName}/callback`
 const getRequestUrl = ({ event }) => `https://${event.requestContext.domainName}${event.rawPath}?${event.rawQueryString}`
