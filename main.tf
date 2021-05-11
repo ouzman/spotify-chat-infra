@@ -58,3 +58,7 @@ module "login_api" {
   registration_lambda_arn           = module.registration_lambda.registration_lambda_arn
   registration_lambda_function_name = module.registration_lambda.registration_lambda_function_name
 }
+
+module "chat_lambda" {
+  source = "./chat-lambda"
+}
