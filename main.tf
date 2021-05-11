@@ -65,8 +65,8 @@ module "chat_lambda" {
 
 module "chat_api" {
   source = "./chat-api"
-  chat_lambda_invoke_arn                           = module.chat_lambda.chat_lambda_invoke_arn
+  chat_lambda_invoke_arn                    = module.chat_lambda.chat_lambda_invoke_arn
   chat_lambda_function_name                 = module.chat_lambda.chat_lambda_function_name
-  api_key_authorizer_lambda_arn             = module.api_key_authorizer_lambda.api_key_authorizer_lambda_arn
+  api_key_authorizer_lambda_invoke_arn      = module.api_key_authorizer_lambda.api_key_authorizer_lambda_invoke_arn
   api_key_authorizer_lambda_function_name   = module.api_key_authorizer_lambda.api_key_authorizer_lambda_function_name
 }

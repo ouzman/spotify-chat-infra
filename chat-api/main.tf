@@ -31,7 +31,7 @@ resource "aws_lambda_permission" "chat_lambda_permission" {
 resource "aws_apigatewayv2_authorizer" "chat_api_authorizer" {
   api_id           = aws_apigatewayv2_api.chat_api.id
   authorizer_type  = "REQUEST"
-  authorizer_uri   = var.api_key_authorizer_lambda_arn
+  authorizer_uri   = var.api_key_authorizer_lambda_invoke_arn
   identity_sources = ["route.request.header.X-SC-ApiKey"]
   name             = "api-key-authorizer"
 }
