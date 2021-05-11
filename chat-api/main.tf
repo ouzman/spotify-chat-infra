@@ -64,9 +64,6 @@ resource "aws_apigatewayv2_route" "default_route" {
   api_id    = aws_apigatewayv2_api.chat_api.id
   route_key = "$default"
   target    = "integrations/${aws_apigatewayv2_integration.chat_lambda_integration.id}"
-
-  authorization_type    = "CUSTOM"
-  authorizer_id         = aws_apigatewayv2_authorizer.chat_api_authorizer.id
 }
 
 resource "aws_apigatewayv2_deployment" "default_deployment" {
