@@ -45,6 +45,14 @@ module "registration_lambda" {
   spotify_lambda_function_name  = module.spotify_lambda.spotify_lambda_function_name
 }
 
+module "api_key_authorizer_lambda" {
+  source                  = "./api-key-authorizer-lambda"
+  users_db_table_arn            = module.users_db.users_db_arn
+  users_db_table_name           = local.users_db_table_name
+  api_keys_db_table_arn         = module.api_keys_db.api_keys_db_arn
+  api_keys_db_table_name        = local.api_keys_db_table_name
+}
+
 module "login_api" {
   source                    = "./login-api"
   registration_lambda_arn           = module.registration_lambda.registration_lambda_arn
