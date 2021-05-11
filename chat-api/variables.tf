@@ -9,3 +9,7 @@ variable "chat_lambda_function_name" {
 variable "api_key_authorizer_lambda_arn" {
     type = string
 }
+
+variable "api_key_authorizer_lambda_function_name" {
+    type = string
+}
