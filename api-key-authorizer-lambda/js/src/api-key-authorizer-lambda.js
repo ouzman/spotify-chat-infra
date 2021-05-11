@@ -47,7 +47,7 @@ exports.handler = async (event, context) => {
 
         log({ apiKeyDocument });
     
-        const { SpotifyUri: spotifyUri } = apiKeyDocument;
+        const { User: spotifyUri } = apiKeyDocument;
 
         const response = allow({ event, apiKey, spotifyUri });
 
