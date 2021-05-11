@@ -35,13 +35,13 @@ exports.handler = async (event, context) => {
     try {
         const apiKey = event.headers[HEADER_NAME];
 
-        if (!!apiKey) {
+        if (!apiKey) {
             throw Error(`Request doesn't have ${HEADER_NAME} header`);
         }
 
         const { Item: apiKeyDocument } = await getByApiKey({ apiKey }); 
         
-        if (!!apiKeyDocument) {
+        if (!apiKeyDocument) {
             throw Error(`Unknown API Key: ${apiKey}`);
         }
 
