@@ -79,3 +79,8 @@ module "client_response_queue" {
   source      = "./client-response-queue"
   queue_name  = local.client_response_queue_queue_name
 }
+
+module "client_response_consumer_lambda" {
+  source                    = "./client-response-consumer-lambda"
+  client_response_queue_arn = module.client_response_queue.client_response_queue_arn
+}
