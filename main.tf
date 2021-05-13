@@ -15,8 +15,9 @@ provider "aws" {
 provider "archive" {}
 
 locals {
-  users_db_table_name     = "spotify-chat-users"
-  api_keys_db_table_name  = "spotify-chat-api-keys"
+  users_db_table_name               = "spotify-chat-users"
+  api_keys_db_table_name            = "spotify-chat-api-keys"
+  client_response_queue_queue_name  = "client-response-queue"
 }
 
 module "users_db" {
@@ -61,6 +62,9 @@ module "login_api" {
 
 module "chat_lambda" {
   source = "./chat-lambda"
+  
+  // FIXME: hack for circular dependency problem
+  client_response_queue_queue_name = local.client_response_queue_queue_name 
 }
 
 module "chat_api" {
@@ -72,5 +76,6 @@ module "chat_api" {
 }
 
 module "client_response_queue" {
-  source = "./client-response-queue"
+  source      = "./client-response-queue"
+  queue_name  = local.client_response_queue_queue_name
 }

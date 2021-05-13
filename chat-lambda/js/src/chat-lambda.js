@@ -1,14 +1,21 @@
+const AWS = require('aws-sdk');
+
 const { log } = require('./util');
+
+const sqs = new AWS.SQS();
+
+const { AWS_REGION, AWS_ACCOUNT_ID, CLIENT_RESPONSE_QUEUE } = process.env.AWS_REGION;
+const CLIENT_RESPONSE_QUEUE_URL = `https://sqs.${AWS_REGION}.amazonaws.com/${AWS_ACCOUNT_ID}/${CLIENT_RESPONSE_QUEUE}`
 
 const getSuccessRouteHandler = ({ bodyFunction } = {}) => {
     return ({ event }) => {
-        return { 
+        return {
             statusCode: 200,
             body: JSON.stringify({
                 message: 'OK',
                 body: bodyFunction && bodyFunction({ event }) || undefined,
             })
-         };    
+        };
     }
 }
 
@@ -31,14 +38,26 @@ const getResponse = ({ routeKey, event }) => {
     }
 }
 
+const sendResponseToClient = ({ connectionId, message }) => {
+    return sqs.sendMessage({
+        MessageBody: JSON.stringify({
+            connectionId,
+            message
+        }),
+        QueueUrl: CLIENT_RESPONSE_QUEUE_URL
+    }).promise();
+}
+
 exports.handler = async (event, context) => {
     log({ event, context });
 
-    const { routeKey } = event.requestContext;
+    const { routeKey, connectionId } = event.requestContext;
 
     const response = getResponse({ routeKey, event });
 
-    log({ event, context, response});
+    log({ event, context, response });
 
-    return response;
+    sendResponseToClient({ connectionId, message: response })
+
+    return {};
 };

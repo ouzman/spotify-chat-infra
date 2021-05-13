@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 data "archive_file" "chat_lambda_archive" {
   type        = "zip"
   source_dir = "${path.module}/js/src"
@@ -42,6 +44,13 @@ resource "aws_iam_role_policy" "chat_lambda_policy" {
       ],
       "Resource": "arn:aws:logs:*:*:*",
       "Effect": "Allow"
+    },
+    {
+      "Action": [
+        "sqs:SendMessage",
+      ],
+      "Resource": "arn:aws:sqs:*:*:${var.client_response_queue_queue_name}",
+      "Effect": "Allow"
     }
   ]
 }
@@ -57,6 +66,13 @@ resource "aws_lambda_function" "chat_lambda" {
   source_code_hash = data.archive_file.chat_lambda_archive.output_base64sha256
 
   runtime = "nodejs12.x"
+
+  environment {
+      variables = {
+          AWS_ACCOUNT_ID = data.aws_caller_identity.current.account_id,
+          CLIENT_RESPONSE_QUEUE = var.client_response_queue_queue_name
+      }
+  }
 
   tags = {
     project = "spotify-chat"
