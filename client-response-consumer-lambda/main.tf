@@ -51,6 +51,16 @@ data "aws_iam_policy_document" "client_response_consumer_lambda_policy" {
     ]
     effect = "Allow"
   }
+
+  statement {
+    actions = [
+      "execute-api:ManageConnections",
+    ]
+    resources = [
+      var.chat_api_execution_arn,
+    ]
+    effect = "Allow"
+  }
 }
 
 resource "aws_iam_role_policy" "client_response_consumer_lambda_policy" {
@@ -68,6 +78,12 @@ resource "aws_lambda_function" "client_response_consumer_lambda" {
   source_code_hash = data.archive_file.client_response_consumer_lambda_archive.output_base64sha256
 
   runtime = "nodejs12.x"
+
+  environment {
+    variables = {
+      CHAT_API_ENDPOINT = var.chat_api_endpoint
+    }
+  }
 
   tags = {
     project = "spotify-chat"

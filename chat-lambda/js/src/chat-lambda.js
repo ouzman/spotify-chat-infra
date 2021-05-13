@@ -10,11 +10,7 @@ const sqs = new AWS.SQS();
 const getSuccessRouteHandler = ({ bodyFunction } = {}) => {
     return ({ event }) => {
         return {
-            statusCode: 200,
-            body: JSON.stringify({
-                message: 'OK',
-                body: bodyFunction && bodyFunction({ event }) || undefined,
-            })
+            body: bodyFunction && bodyFunction({ event }) || undefined,
         };
     }
 }

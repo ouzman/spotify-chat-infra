@@ -83,4 +83,6 @@ module "client_response_queue" {
 module "client_response_consumer_lambda" {
   source                    = "./client-response-consumer-lambda"
   client_response_queue_arn = module.client_response_queue.client_response_queue_arn
+  chat_api_endpoint         = module.chat_api.chat_api_endpoint
+  chat_api_execution_arn    = module.chat_api.chat_api_execution_arn
 }
