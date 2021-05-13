@@ -1,5 +1,7 @@
 data "aws_caller_identity" "current" {}
 
+data "aws_region" "current" {}
+
 data "archive_file" "chat_lambda_archive" {
   type        = "zip"
   source_dir = "${path.module}/js/src"
@@ -49,7 +51,7 @@ resource "aws_iam_role_policy" "chat_lambda_policy" {
       "Action": [
         "sqs:SendMessage",
       ],
-      "Resource": "arn:aws:sqs:*:*:${var.client_response_queue_queue_name}",
+      "Resource": "arn:aws:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${var.client_response_queue_queue_name}",
       "Effect": "Allow"
     }
   ]
