@@ -7,38 +7,44 @@ const CLIENT_RESPONSE_QUEUE_URL = `https://sqs.${AWS_REGION}.amazonaws.com/${AWS
 
 const sqs = new AWS.SQS();
 
-const getSuccessRouteHandler = ({ bodyFunction } = {}) => {
-    return ({ event }) => {
-        return {
-            body: bodyFunction && bodyFunction({ event }) || undefined,
-        };
+const createConnectedMessage = ({ event }) => ({
+    connectionId: event.requestContext.connectionId,
+    type: 'CONNECTED',
+    context: {}
+});
+
+const createEchoMessage = ({ event }) => ({
+    connectionId: event.requestContext.connectionId,
+    type: 'ECHO',
+    context: {
+        requestBody: JSON.parse(event.body),
     }
-}
+})
 
 const routeHandlers = {
-    '$connect': getSuccessRouteHandler(),
-    '$disconnect': getSuccessRouteHandler(),
-    '$default': getSuccessRouteHandler({ bodyFunction: ({ event }) => ({ requestBody: event.body }) }),
-}
+    '$connect': async ({ event }) => { 
+        const message = createConnectedMessage({ event });
 
-const getResponse = ({ routeKey, event }) => {
-    const handler = routeHandlers[routeKey];
+        const sqsResponse = await sendResponseToClient(message);
 
-    if (!!handler) {
-        return handler({ event });
-    } else {
-        return {
-            statusCode: 400,
-            message: `Unknown route: ${routeKey}`
-        }
+        log({ message, sqsResponse });
+    },
+    '$disconnect': async ({ event }) => { },
+    '$default': async ({ event }) => {
+        const message = createEchoMessage({ event });
+
+        const sqsResponse = await sendResponseToClient(message);
+
+        log({ message, sqsResponse });
     }
 }
 
-const sendResponseToClient = async ({ connectionId, message }) => {
+const sendResponseToClient = async ({ connectionId, type: messageType, context: messageContext }) => {
     return sqs.sendMessage({
         MessageBody: JSON.stringify({
             connectionId,
-            message
+            messageType,
+            messageContext,
         }),
         QueueUrl: CLIENT_RESPONSE_QUEUE_URL
     }).promise();
@@ -47,13 +53,15 @@ const sendResponseToClient = async ({ connectionId, message }) => {
 exports.handler = async (event, context) => {
     log({ event, context });
 
-    const { routeKey, connectionId } = event.requestContext;
+    const { routeKey } = event.requestContext;
 
-    const response = getResponse({ routeKey, event });
+    const routeHandler = routeHandlers[routeKey];
 
-    const sqsResponse = await sendResponseToClient({ connectionId, message: response });
+    if (!routeHandler) {
+        throw Error(`Unknown route: ${routeKey}`);
+    }
 
-    log({ event, context, response, sqsResponse });
+    await routeHandler({ event });
 
     return {};
 };
