@@ -1,6 +1,6 @@
 const { log } = require('./util');
 
-const getSuccessRouteHandler = ({ bodyFunction }) => {
+const getSuccessRouteHandler = ({ bodyFunction } = {}) => {
     return ({ event }) => {
         return { 
             statusCode: 200,
@@ -9,22 +9,16 @@ const getSuccessRouteHandler = ({ bodyFunction }) => {
                 body: bodyFunction && bodyFunction({ event }) || undefined,
             })
          };    
-
     }
 }
 
 const routeHandlers = {
     '$connect': getSuccessRouteHandler(),
     '$disconnect': getSuccessRouteHandler(),
-    '$default': getSuccessRouteHandler({ bodyFunction: event => ({ requestBody: event.requestContext.body }) }),
+    '$default': getSuccessRouteHandler({ bodyFunction: ({ event }) => ({ requestBody: event.body }) }),
 }
 
-
-exports.handler = async (event, context) => {
-    log({ event, context });
-
-    const { routeKey } = event.requestContext;
-
+const getResponse = ({ routeKey, event }) => {
     const handler = routeHandlers[routeKey];
 
     if (!!handler) {
@@ -35,4 +29,16 @@ exports.handler = async (event, context) => {
             message: `Unknown route: ${routeKey}`
         }
     }
+}
+
+exports.handler = async (event, context) => {
+    log({ event, context });
+
+    const { routeKey } = event.requestContext;
+
+    const response = getResponse({ routeKey, event });
+
+    log({ event, context, response});
+
+    return response;
 };
