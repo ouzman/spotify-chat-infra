@@ -55,9 +55,9 @@ exports.handler = async (event, context) => {
 
     const response = getResponse({ routeKey, event });
 
-    log({ event, context, response });
+    const sqsResponse = await sendResponseToClient({ connectionId, message: response });
 
-    await sendResponseToClient({ connectionId, message: response })
+    log({ event, context, response, sqsResponse });
 
     return {};
 };
