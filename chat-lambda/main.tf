@@ -8,55 +8,57 @@ data "archive_file" "chat_lambda_archive" {
   output_path = "${path.module}/js/dist/chat-lambda.zip"
 }
 
+data "aws_iam_policy_document" "chat_lambda_role_policy" {
+  statement {
+    actions = [
+      "sts:AssumeRole",
+    ]
+    principals {
+      type            = "Service"
+      identifiers     = ["lambda.amazonaws.com"]
+    }
+    effect = "Allow"
+  }
+}
+
 resource "aws_iam_role" "chat_lambda_role" {
   name = "spotify_chat_chat_lambda_role"
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
+  assume_role_policy = data.aws_iam_policy_document.chat_lambda_role_policy.json
+
   tags = {
     project = "spotify-chat"
   }
 }
 
-resource "aws_iam_role_policy" "chat_lambda_policy" {
-  name        = "spotify_chat_chat_lambda_policy"
-  role        =  aws_iam_role.chat_lambda_role.id
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Resource": "arn:aws:logs:*:*:*",
-      "Effect": "Allow"
-    },
-    {
-      "Action": [
-        "sqs:SendMessage",
-      ],
-      "Resource": "arn:aws:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${var.client_response_queue_queue_name}",
-      "Effect": "Allow"
-    }
-  ]
+data "aws_iam_policy_document" "chat_lambda_policy" {
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+    resources = [
+      "arn:aws:logs:*:*:*",
+    ]
+    effect = "Allow"
 }
-EOF
+
+  statement {
+    actions = [
+      "sqs:SendMessage",
+    ]
+    resources = [
+      "arn:aws:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${var.client_response_queue_queue_name}"
+    ]
+    effect = "Allow"
+  }
+}
+
+resource "aws_iam_role_policy" "chat_lambda_policy" {
+  name      = "spotify_chat_chat_lambda_policy"
+  role      = aws_iam_role.chat_lambda_role.id
+  policy    = data.aws_iam_policy_document.chat_lambda_policy.json
 }
 
 resource "aws_lambda_function" "chat_lambda" {
@@ -70,10 +72,10 @@ resource "aws_lambda_function" "chat_lambda" {
   runtime = "nodejs12.x"
 
   environment {
-      variables = {
-          AWS_ACCOUNT_ID = data.aws_caller_identity.current.account_id,
-          CLIENT_RESPONSE_QUEUE = var.client_response_queue_queue_name
-      }
+    variables = {
+      AWS_ACCOUNT_ID = data.aws_caller_identity.current.account_id,
+      CLIENT_RESPONSE_QUEUE = var.client_response_queue_queue_name
+    }
   }
 
   tags = {
