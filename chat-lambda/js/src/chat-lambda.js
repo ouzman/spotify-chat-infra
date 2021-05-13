@@ -38,7 +38,7 @@ const getResponse = ({ routeKey, event }) => {
     }
 }
 
-const sendResponseToClient = ({ connectionId, message }) => {
+const sendResponseToClient = async ({ connectionId, message }) => {
     return sqs.sendMessage({
         MessageBody: JSON.stringify({
             connectionId,
@@ -57,7 +57,7 @@ exports.handler = async (event, context) => {
 
     log({ event, context, response });
 
-    sendResponseToClient({ connectionId, message: response })
+    await sendResponseToClient({ connectionId, message: response })
 
     return {};
 };
