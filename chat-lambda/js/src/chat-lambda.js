@@ -2,12 +2,6 @@ const AWS = require('aws-sdk');
 
 const { log } = require('./util');
 
-const createConnectedMessage = ({ event }) => ({
-    connectionId: event.requestContext.connectionId,
-    type: 'CONNECTED',
-    context: {}
-});
-
 const createEchoMessage = ({ event }) => ({
     connectionId: event.requestContext.connectionId,
     type: 'ECHO',
@@ -17,13 +11,7 @@ const createEchoMessage = ({ event }) => ({
 })
 
 const routeHandlers = {
-    '$connect': async ({ event }) => { 
-        const message = createConnectedMessage({ event });
-
-        const sqsResponse = await sendResponseToClient(message);
-
-        log({ message, sqsResponse });
-    },
+    '$connect': async ({ event }) => { },
     '$disconnect': async ({ event }) => { },
     '$default': async ({ event }) => {
         const message = createEchoMessage({ event });
@@ -38,22 +26,7 @@ const routeHandlers = {
         }).promise();
 
         log({ message, response });
-
-        const sqsResponse = await sendResponseToClient(message);
-
-        log({ message, sqsResponse });
     }
-}
-
-const sendResponseToClient = async ({ connectionId, type: messageType, context: messageContext }) => {
-    return sqs.sendMessage({
-        MessageBody: JSON.stringify({
-            connectionId,
-            messageType,
-            messageContext,
-        }),
-        QueueUrl: CLIENT_RESPONSE_QUEUE_URL
-    }).promise();
 }
 
 exports.handler = async (event, context) => {
