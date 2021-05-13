@@ -17,7 +17,6 @@ provider "archive" {}
 locals {
   users_db_table_name               = "spotify-chat-users"
   api_keys_db_table_name            = "spotify-chat-api-keys"
-  client_response_queue_queue_name  = "client-response-queue"
 }
 
 module "users_db" {
@@ -62,9 +61,6 @@ module "login_api" {
 
 module "chat_lambda" {
   source = "./chat-lambda"
-  
-  // FIXME: hack for circular dependency problem
-  client_response_queue_queue_name = local.client_response_queue_queue_name 
 }
 
 module "chat_api" {
@@ -74,16 +70,4 @@ module "chat_api" {
   api_key_authorizer_lambda_invoke_arn      = module.api_key_authorizer_lambda.api_key_authorizer_lambda_invoke_arn
   api_key_authorizer_lambda_function_name   = module.api_key_authorizer_lambda.api_key_authorizer_lambda_function_name
   chat_lambda_role_name                     = module.chat_lambda.chat_lambda_role_name
-}
-
-module "client_response_queue" {
-  source      = "./client-response-queue"
-  queue_name  = local.client_response_queue_queue_name
-}
-
-module "client_response_consumer_lambda" {
-  source                    = "./client-response-consumer-lambda"
-  client_response_queue_arn = module.client_response_queue.client_response_queue_arn
-  chat_api_endpoint         = module.chat_api.chat_api_endpoint
-  chat_api_execution_arn    = module.chat_api.chat_api_execution_arn
 }
