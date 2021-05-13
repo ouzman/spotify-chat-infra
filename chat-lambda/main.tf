@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "chat_lambda_policy" {
       "arn:aws:logs:*:*:*",
     ]
     effect = "Allow"
-}
+  }
 
   statement {
     actions = [
