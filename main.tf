@@ -73,6 +73,7 @@ module "chat_api" {
   chat_lambda_function_name                 = module.chat_lambda.chat_lambda_function_name
   api_key_authorizer_lambda_invoke_arn      = module.api_key_authorizer_lambda.api_key_authorizer_lambda_invoke_arn
   api_key_authorizer_lambda_function_name   = module.api_key_authorizer_lambda.api_key_authorizer_lambda_function_name
+  chat_lambda_role_name                     = module.chat_lambda.chat_lambda_role_name
 }
 
 module "client_response_queue" {

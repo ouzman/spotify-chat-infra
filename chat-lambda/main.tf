@@ -53,6 +53,16 @@ data "aws_iam_policy_document" "chat_lambda_policy" {
     ]
     effect = "Allow"
   }
+
+  statement {
+    actions = [
+      "sqs:SendMessage",
+    ]
+    resources = [
+      "arn:aws:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${var.client_response_queue_queue_name}"
+    ]
+    effect = "Allow"
+  }
 }
 
 resource "aws_iam_role_policy" "chat_lambda_policy" {

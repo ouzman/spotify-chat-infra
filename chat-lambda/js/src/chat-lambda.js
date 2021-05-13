@@ -2,11 +2,6 @@ const AWS = require('aws-sdk');
 
 const { log } = require('./util');
 
-const { AWS_REGION, AWS_ACCOUNT_ID, CLIENT_RESPONSE_QUEUE } = process.env;
-const CLIENT_RESPONSE_QUEUE_URL = `https://sqs.${AWS_REGION}.amazonaws.com/${AWS_ACCOUNT_ID}/${CLIENT_RESPONSE_QUEUE}`
-
-const sqs = new AWS.SQS();
-
 const createConnectedMessage = ({ event }) => ({
     connectionId: event.requestContext.connectionId,
     type: 'CONNECTED',
@@ -32,6 +27,17 @@ const routeHandlers = {
     '$disconnect': async ({ event }) => { },
     '$default': async ({ event }) => {
         const message = createEchoMessage({ event });
+
+        const managementApiClient = new AWS.ApiGatewayManagementApi({ 
+            endpoint: `https://${event.requestContext.domainName}/${event.requestContext.stage}`,
+        });
+
+        const response = await managementApi.postToConnection({
+            ConnectionId: message.connectionId,
+            Data: JSON.stringify({ message }),
+        }).promise();
+
+        log({ message, response });
 
         const sqsResponse = await sendResponseToClient(message);
 

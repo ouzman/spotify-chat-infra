@@ -97,3 +97,25 @@ resource "aws_apigatewayv2_stage" "default_stage" {
   deployment_id = aws_apigatewayv2_deployment.default_deployment.id
   auto_deploy   = false
 }
+
+data "aws_iam_policy_document" "chat_lambda_policy" {
+  statement {
+    actions = [
+      "execute-api:ManageConnections",
+    ]
+    resources = [
+      "${aws_apigatewayv2_api.chat_api.execution_arn}/*",
+    ]
+    effect = "Allow"
+  }
+}
+
+resource "aws_iam_policy" "chat_lambda_manage_connections_policy" {
+  name   = "spotify_chat_chat_lambda_manage_connections_policy"
+  policy = data.aws_iam_policy_document.chat_lambda_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "chat_api_chat_lambda_manage_connections_policy_attachment" {
+  role       = var.chat_lambda_role_name
+  policy_arn = aws_iam_policy.chat_lambda_manage_connections_policy.arn
+}
