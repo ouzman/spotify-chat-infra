@@ -16,7 +16,7 @@ const routeHandlers = {
     '$default': async ({ event }) => {
         const message = createEchoMessage({ event });
 
-        const managementApiClient = new AWS.ApiGatewayManagementApi({ 
+        const managementApi = new AWS.ApiGatewayManagementApi({ 
             endpoint: `https://${event.requestContext.domainName}/${event.requestContext.stage}`,
         });
 
