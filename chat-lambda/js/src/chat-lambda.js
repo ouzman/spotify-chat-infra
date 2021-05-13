@@ -2,10 +2,10 @@ const AWS = require('aws-sdk');
 
 const { log } = require('./util');
 
-const sqs = new AWS.SQS();
-
-const { AWS_REGION, AWS_ACCOUNT_ID, CLIENT_RESPONSE_QUEUE } = process.env.AWS_REGION;
+const { AWS_REGION, AWS_ACCOUNT_ID, CLIENT_RESPONSE_QUEUE } = process.env;
 const CLIENT_RESPONSE_QUEUE_URL = `https://sqs.${AWS_REGION}.amazonaws.com/${AWS_ACCOUNT_ID}/${CLIENT_RESPONSE_QUEUE}`
+
+const sqs = new AWS.SQS();
 
 const getSuccessRouteHandler = ({ bodyFunction } = {}) => {
     return ({ event }) => {
