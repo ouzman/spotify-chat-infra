@@ -70,3 +70,7 @@ module "chat_api" {
   api_key_authorizer_lambda_invoke_arn      = module.api_key_authorizer_lambda.api_key_authorizer_lambda_invoke_arn
   api_key_authorizer_lambda_function_name   = module.api_key_authorizer_lambda.api_key_authorizer_lambda_function_name
 }
+
+module "client_response_queue" {
+  source = "./client-response-queue"
+}
