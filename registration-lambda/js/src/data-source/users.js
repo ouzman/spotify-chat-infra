@@ -4,7 +4,7 @@ const dynamo = new AWS.DynamoDB.DocumentClient();
 
 const TABLE_NAME = process.env.USERS_DB_TABLE_NAME
 
-exports.createUser = async ({ tokenInfo, spotifyUser }) => {
+exports.upsertUser = async ({ tokenInfo, spotifyUser }) => {
     return dynamo.update({
         TableName: TABLE_NAME,
         Key: { 'SpotifyUri': spotifyUser.uri },
@@ -32,5 +32,6 @@ exports.getBySpotifyUri = async ({ spotifyUri }) => {
         Key: {
             'SpotifyUri': spotifyUri
         }
-    }).promise();
+    }).promise()
+        .then(res => res.Item);
 }

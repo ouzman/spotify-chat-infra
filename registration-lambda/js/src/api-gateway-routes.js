@@ -2,7 +2,7 @@ const { log } = require('./util');
 
 const { getAuthorizeUrl, getToken } = require('./spotify-authorizer');
 const { getUserInfo } = require('./data-source/spotify')
-const { createUser } = require('./data-source/users');
+const { upsertUser, getBySpotifyUri } = require('./data-source/users');
 const { createApiKey } = require('./data-source/apiKeys');
 
 const generateCallbackUrl = ({ event }) => `https://${event.requestContext.domainName}/callback`
@@ -40,15 +40,18 @@ async function spotifyAuthSuccess({ event, tokenInfo }) {
 
     const { spotifyUser } = spotifyUserResponse.context;
 
-    const user = await createUser({ tokenInfo, spotifyUser });
+    const user = await upsertUser({ tokenInfo, spotifyUser });
 
     log({ user });
+
+    // TODO: query apikeys by user
+    // TODO: delete existing api keys
 
     const { ApiKey: apiKey } = await createApiKey({ user });
 
     log({ apiKey });
 
-    return apiKeyResponse({ apiKey });
+    return apiKeyResponse({ apiKey });    
 }
 
 function apiKeyResponse({ apiKey }) {

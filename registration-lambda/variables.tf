@@ -29,3 +29,7 @@ variable "spotify_lambda_arn" {
 variable "spotify_lambda_function_name" {
     type = string
 }
+
+variable "api_keys_db_user_uri_index" {
+    type = string
+}

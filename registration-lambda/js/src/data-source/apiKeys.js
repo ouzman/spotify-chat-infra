@@ -22,13 +22,8 @@ exports.createApiKey = async ({ user }) => {
         .then(res => res.Attributes);
 }
 
-exports.getByApiKey = async ({ apiKey }) => {
-    return dynamo.get({
-        TableName: TABLE_NAME,
-        Key: {
-            'ApiKey': apiKey
-        }
-    }).promise();
+exports.queryByUserUri = async ({ userUri }) => {
+
 }
 
 exports.deleteByApiKey = async ({ apiKey }) => {

@@ -90,7 +90,8 @@ resource "aws_lambda_function" "registration_lambda" {
       SPOTIFY_CLIENT_SECRET = var.spotify_client_secret,
       USERS_DB_TABLE_NAME = var.users_db_table_name,
       API_KEYS_DB_TABLE_NAME = var.api_keys_db_table_name,
-      SPOTIFY_LAMBDA_FUNCTION_NAME = var.spotify_lambda_function_name
+      SPOTIFY_LAMBDA_FUNCTION_NAME = var.spotify_lambda_function_name,
+      API_KEYS_DB_USER_URI_INDEX = var.api_keys_db_user_uri_index,
     }
   }
   tags = {

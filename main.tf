@@ -15,8 +15,9 @@ provider "aws" {
 provider "archive" {}
 
 locals {
-  users_db_table_name               = "spotify-chat-users"
-  api_keys_db_table_name            = "spotify-chat-api-keys"
+  users_db_table_name        = "spotify-chat-users"
+  api_keys_db_table_name     = "spotify-chat-api-keys"
+  api_keys_db_user_uri_index = "user-uri-index"
 }
 
 module "users_db" {
@@ -27,6 +28,7 @@ module "users_db" {
 module "api_keys_db" {
   source      = "./api-keys-db"
   table_name  = local.api_keys_db_table_name
+  user_uri_index = local.api_keys_db_user_uri_index
 }
 
 module "spotify_lambda" {
@@ -41,16 +43,17 @@ module "registration_lambda" {
   users_db_table_name           = local.users_db_table_name
   api_keys_db_table_arn         = module.api_keys_db.api_keys_db_arn
   api_keys_db_table_name        = local.api_keys_db_table_name
+  api_keys_db_user_uri_index    = local.api_keys_db_user_uri_index
   spotify_lambda_arn            = module.spotify_lambda.spotify_lambda_arn
   spotify_lambda_function_name  = module.spotify_lambda.spotify_lambda_function_name
 }
 
 module "api_key_authorizer_lambda" {
-  source                  = "./api-key-authorizer-lambda"
-  users_db_table_arn            = module.users_db.users_db_arn
-  users_db_table_name           = local.users_db_table_name
-  api_keys_db_table_arn         = module.api_keys_db.api_keys_db_arn
-  api_keys_db_table_name        = local.api_keys_db_table_name
+  source                 = "./api-key-authorizer-lambda"
+  users_db_table_arn     = module.users_db.users_db_arn
+  users_db_table_name    = local.users_db_table_name
+  api_keys_db_table_arn  = module.api_keys_db.api_keys_db_arn
+  api_keys_db_table_name = local.api_keys_db_table_name
 }
 
 module "login_api" {
