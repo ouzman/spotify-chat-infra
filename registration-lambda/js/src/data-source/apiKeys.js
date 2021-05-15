@@ -10,9 +10,9 @@ exports.createApiKey = async ({ user }) => {
     return dynamo.update({
         TableName: TABLE_NAME,
         Key: { 'ApiKey': generateApiKey({ user }) },
-        UpdateExpression: 'SET #USER=:spotifyUri',
+        UpdateExpression: 'SET #USERURI=:spotifyUri',
         ExpressionAttributeNames: {
-            '#USER': 'User'
+            '#USERURI': 'UserUri'
         },
         ExpressionAttributeValues: {
             ':spotifyUri': user.SpotifyUri
