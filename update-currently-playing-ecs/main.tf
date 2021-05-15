@@ -1,4 +1,3 @@
-
 data "aws_iam_policy_document" "update_currently_playing_task_role_policy" {
   statement {
     actions = [
@@ -89,6 +88,40 @@ resource "aws_ecs_cluster" "update_currently_playing_cluster" {
   }
 }
 
+resource "aws_key_pair" "ecs_instance_key_pair" {
+  key_name   = "ecs-instance-key-pair"
+  public_key = var.ecs_instance_public_key
+}
+
+data "aws_ami" "ecs_optimized" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-ecs-hvm-2.0.*-x86_64-ebs"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = [ "amazon" ]
+}
+
+resource "aws_instance" "ecs_instance" {
+  ami                    = data.aws_ami.ecs_optimized.id
+  instance_type          = "t2.micro"
+  iam_instance_profile   = "ecsInstanceRole"
+  key_name               = aws_key_pair.ecs_instance_key_pair.key_name
+  ebs_optimized          = "false"
+  user_data              = templatefile("${path.module}/bash/userdata.bash", { cluserName: aws_ecs_cluster.update_currently_playing_cluster.name, instanceTags: jsonencode({ "project" = "spotify-chat" }) })
+
+  tags = {
+    project = "spotify-chat"
+  }
+}
+
 resource "aws_ecs_service" "update_currently_playing_service" {
   name                  = "update-currently-playing-service"
   cluster               = aws_ecs_cluster.update_currently_playing_cluster.id
@@ -100,4 +133,6 @@ resource "aws_ecs_service" "update_currently_playing_service" {
   tags = {
     project = "spotify-chat"
   }
+
+  depends_on = [ aws_instance.ecs_instance ]
 }

@@ -9,3 +9,7 @@ variable "users_db_table_name" {
 variable "update_currently_playing_source_bucket_arn" {
   type = string
 }
+
+variable "ecs_instance_public_key" {
+  type = string
+}
