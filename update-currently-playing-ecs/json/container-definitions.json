@@ -15,7 +15,7 @@
         "command": [
             "bash",
             "-c",
-            "node -e \"console.log({ env: process.env })\""
+            "bash"
         ],
         "memory": 512
     }
