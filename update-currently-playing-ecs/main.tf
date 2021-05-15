@@ -115,7 +115,9 @@ resource "aws_instance" "ecs_instance" {
   iam_instance_profile   = "ecsInstanceRole"
   key_name               = aws_key_pair.ecs_instance_key_pair.key_name
   ebs_optimized          = "false"
-  user_data              = templatefile("${path.module}/bash/userdata.bash", { cluserName: aws_ecs_cluster.update_currently_playing_cluster.name, instanceTags: jsonencode({ "project" = "spotify-chat" }) })
+  user_data              = templatefile("${path.module}/bash/userdata.bash", { clusterName = aws_ecs_cluster.update_currently_playing_cluster.name, instanceTags = jsonencode({ "project" = "spotify-chat" }) })
+
+  associate_public_ip_address = true
 
   tags = {
     project = "spotify-chat"
