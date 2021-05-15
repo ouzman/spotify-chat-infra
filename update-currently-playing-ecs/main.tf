@@ -81,13 +81,22 @@ resource "aws_ecs_task_definition" "update_currently_playing_task" {
   }
 }
 
+resource "aws_ecs_cluster" "update_currently_playing_cluster" {
+  name = "update-currently-playing-cluster"
+
+  tags = {
+    project = "spotify-chat"
+  }
+}
+
 resource "aws_ecs_service" "update_currently_playing_service" {
   name                  = "update-currently-playing-service"
+  cluster               = aws_ecs_cluster.update_currently_playing_cluster.id
   task_definition       = aws_ecs_task_definition.update_currently_playing_task.arn
   scheduling_strategy   = "DAEMON"
   launch_type           = "EC2"
   force_new_deployment  = true
-  
+
   tags = {
     project = "spotify-chat"
   }
