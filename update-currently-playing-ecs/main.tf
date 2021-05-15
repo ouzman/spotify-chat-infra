@@ -71,7 +71,8 @@ resource "aws_iam_role_policy" "update_currently_playing_task_policy" {
 }
 
 resource "aws_ecs_task_definition" "update_currently_playing_task" {
-  family                = "update_currently_playing_task"
-  container_definitions = templatefile("${path.module}/json/container-definitions.json", { usersDbTableName: var.users_db_table_name })
-  task_role_arn         = aws_iam_role.update_currently_playing_task_role.arn
+  family                    = "update_currently_playing_task"
+  container_definitions     = templatefile("${path.module}/json/container-definitions.json", { usersDbTableName: var.users_db_table_name })
+  requires_compatibilities  = [ "EC2" ]
+  task_role_arn             = aws_iam_role.update_currently_playing_task_role.arn
 }
