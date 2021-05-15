@@ -60,7 +60,9 @@ module "login_api" {
 }
 
 module "chat_lambda" {
-  source = "./chat-lambda"
+  source              = "./chat-lambda"
+  users_db_table_arn  = module.users_db.users_db_arn
+  users_db_table_name = local.users_db_table_name
 }
 
 module "chat_api" {

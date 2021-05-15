@@ -39,6 +39,22 @@ data "aws_iam_policy_document" "chat_lambda_policy" {
     ]
     effect = "Allow"
   }
+  
+  statement {
+    actions = [
+      "dynamodb:PutItem",
+      "dynamodb:DeleteItem",
+      "dynamodb:GetItem",
+      "dynamodb:UpdateItem",
+      "dynamodb:Scan",
+      "dynamodb:Query",
+    ]
+    resources = [
+      var.users_db_table_arn,
+      "${var.users_db_table_arn}/index/*",
+    ]
+    effect = "Allow"
+  }
 }
 
 resource "aws_iam_role_policy" "chat_lambda_policy" {
@@ -57,6 +73,11 @@ resource "aws_lambda_function" "chat_lambda" {
 
   runtime = "nodejs12.x"
 
+  environment {
+    variables = {
+      USERS_DB_TABLE_NAME = var.users_db_table_name
+    }
+  }
   tags = {
     project = "spotify-chat"
   }

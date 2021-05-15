@@ -2,6 +2,8 @@ const AWS = require('aws-sdk');
 
 const { log } = require('./util');
 
+const { getBySpotifyUri, setConnectionId } = require('./data-source/users');
+
 const createEchoMessage = ({ event }) => ({
     connectionId: event.requestContext.connectionId,
     type: 'ECHO',
@@ -11,8 +13,27 @@ const createEchoMessage = ({ event }) => ({
 })
 
 const routeHandlers = {
-    '$connect': async ({ event }) => { },
-    '$disconnect': async ({ event }) => { },
+    '$connect': async ({ event }) => {
+        const { connectionId, authorizer: { principalId: spotifyUri } } = event.requestContext;
+
+        const user = await getBySpotifyUri({ spotifyUri });
+
+        if (!!user.ConnectionId) {
+            // TODO: close connection
+            // TODO: dismiss conversation
+        }
+
+        await setConnectionId({ user, connectionId });
+     },
+    '$disconnect': async ({ event }) => { 
+        const { connectionId, authorizer: { principalId: spotifyUri } } = event.requestContext;
+
+        const user = await getBySpotifyUri({ spotifyUri });
+
+        if (user.ConnectionId === connectionId) {
+            await setConnectionId({ user, connectionId: '' });
+        }
+    },
     '$default': async ({ event }) => {
         const message = createEchoMessage({ event });
 
