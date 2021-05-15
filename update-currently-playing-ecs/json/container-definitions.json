@@ -1,0 +1,17 @@
+[
+    {
+        "image": "node:latest",
+        "requires_compatibilities": "EC2",
+        "environment": [
+            {
+                "name": "INTERVAL",
+                "value": "5000"
+            },
+            {
+                "name": "USER_DB_TABLE_NAME",
+                "value": "${usersDbTableName}"
+            }
+        ],
+        "command": "node -e \"console.log({ env: process.env })\""
+    }
+]

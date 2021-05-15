@@ -75,3 +75,10 @@ module "chat_api" {
 module "update_currently_playing_source" {
   source = "./update-currently-playing-source"
 }
+
+module "update_currently_playing_ecs" {
+  source = "./update-currently-playing-ecs"
+  users_db_table_arn                          = module.users_db.users_db_arn
+  users_db_table_name                         = local.users_db_table_name
+  update_currently_playing_source_bucket_arn  = module.update_currently_playing_source.update_currently_playing_source_bucket_arn
+}
