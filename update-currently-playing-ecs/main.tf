@@ -57,7 +57,7 @@ data "aws_iam_policy_document" "update_currently_playing_task_policy" {
       "s3:GetObjectVersion",
     ]
     resources = [
-      "${var.update_currently_playing_source_bucket_arn}",
+      var.update_currently_playing_source_bucket_arn,
       "${var.update_currently_playing_source_bucket_arn}/*",
     ]
     effect = "Allow"

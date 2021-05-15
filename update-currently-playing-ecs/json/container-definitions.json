@@ -12,6 +12,10 @@
                 "value": "${usersDbTableName}"
             }
         ],
-        "command": "node -e \"console.log({ env: process.env })\""
+        "command": [
+            "bash",
+            "-c",
+            "node -e \"console.log({ env: process.env })\""
+        ]
     }
 ]
