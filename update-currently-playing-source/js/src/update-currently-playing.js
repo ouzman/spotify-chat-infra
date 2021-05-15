@@ -1,4 +1,3 @@
-const AWS = require('aws-sdk');
 const fetch = require('node-fetch');
 const { promisify } = require('util');
 
