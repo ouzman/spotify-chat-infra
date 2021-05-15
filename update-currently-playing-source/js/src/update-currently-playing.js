@@ -10,7 +10,7 @@ console.log({ env: process.env });
 const task = async () => {
     const response = await fetch('http://worldclockapi.com/api/json/utc/now');
     const json = await response.json();
-    console.log({ response: json });
+    console.log({ response: json, test: "test" });
 }
 
 const loop = async () => {
