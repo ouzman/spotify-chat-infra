@@ -16,6 +16,7 @@
             "bash",
             "-c",
             "node -e \"console.log({ env: process.env })\""
-        ]
+        ],
+        "memory": 512
     }
 ]
