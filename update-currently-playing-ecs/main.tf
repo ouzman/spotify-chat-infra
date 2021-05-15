@@ -144,6 +144,8 @@ resource "aws_instance" "ecs_instance" {
   tags = {
     project = "spotify-chat"
   }
+
+  depends_on = [ aws_security_group.ecs_instance_security_group ]
 }
 
 resource "aws_ecs_service" "update_currently_playing_service" {
