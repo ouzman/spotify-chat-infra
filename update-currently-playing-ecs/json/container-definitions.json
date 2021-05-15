@@ -15,7 +15,7 @@
         "command": [
             "bash",
             "-c",
-            "npm i @aws-sdk/client-s3 unzipper && node -e \"const unzipper = require('unzipper'); const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3'); const client = new S3Client({ region: 'eu-west-1' }); const command = new GetObjectCommand({ Bucket: 'update-currently-playing-source-code', Key: 'source-archive' }); client.send(command).then(r => r.Body.pipe(unzipper.Extract({ path: './source-archive/' }))); require('./source-archive/update-currently-playing.js').loop()\""
+            "npm i @aws-sdk/client-s3 unzipper && node -e \"const unzipper = require('unzipper'); const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3'); const client = new S3Client({ region: 'eu-west-1' }); const command = new GetObjectCommand({ Bucket: 'update-currently-playing-source-code', Key: 'source-archive' }); client.send(command).then(r => r.Body.pipe(unzipper.Extract({ path: './source-archive/' })).promise()).then(() => require('./source-archive/update-currently-playing.js').loop()); \""
         ],
         "memory": 128,
         "workingDirectory": "/app"
