@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
 const TABLE_NAME = process.env.API_KEYS_DB_TABLE_NAME
+const USER_URI_INDEX_NAME = process.env.API_KEYS_DB_USER_URI_INDEX
 
 exports.createApiKey = async ({ user }) => {
     return dynamo.update({
@@ -23,7 +24,13 @@ exports.createApiKey = async ({ user }) => {
 }
 
 exports.queryByUserUri = async ({ userUri }) => {
-
+    return dynamo.query({
+        TableName: TABLE_NAME,
+        IndexName: USER_URI_INDEX_NAME,
+        KeyConditionExpression: 'UserUri = :uri',
+        ExpressionAttributeValues: { ':uri': userUri }
+    }).promise()
+        .then(res => res.Items);
 }
 
 exports.deleteByApiKey = async ({ apiKey }) => {
