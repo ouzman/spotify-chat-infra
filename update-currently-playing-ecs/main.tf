@@ -109,14 +109,36 @@ data "aws_ami" "ecs_optimized" {
   owners = [ "amazon" ]
 }
 
-resource "aws_instance" "ecs_instance" {
-  ami                    = data.aws_ami.ecs_optimized.id
-  instance_type          = "t2.micro"
-  iam_instance_profile   = "ecsInstanceRole"
-  key_name               = aws_key_pair.ecs_instance_key_pair.key_name
-  ebs_optimized          = "false"
-  user_data              = templatefile("${path.module}/bash/userdata.bash", { clusterName = aws_ecs_cluster.update_currently_playing_cluster.name, instanceTags = jsonencode({ "project" = "spotify-chat" }) })
+resource "aws_security_group" "ecs_instance_security_group" {
+  name = "ecs-instance-security-group"
 
+  ingress {
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    project = "spotify-chat"
+  }
+}
+
+resource "aws_instance" "ecs_instance" {
+  ami                         = data.aws_ami.ecs_optimized.id
+  instance_type               = "t2.micro"
+  iam_instance_profile        = "ecsInstanceRole"
+  key_name                    = aws_key_pair.ecs_instance_key_pair.key_name
+  ebs_optimized               = "false"
+  user_data                   = templatefile("${path.module}/bash/userdata.bash", { clusterName = aws_ecs_cluster.update_currently_playing_cluster.name, instanceTags = jsonencode({ "project" = "spotify-chat" }) })
+  security_groups             = [ aws_security_group.ecs_instance_security_group.id ]
   associate_public_ip_address = true
 
   tags = {
