@@ -13,3 +13,7 @@ variable "update_currently_playing_source_bucket_arn" {
 variable "ecs_instance_public_key" {
   type = string
 }
+
+variable "update_currently_playing_source_etag" {
+  type = string
+}

@@ -82,4 +82,5 @@ module "update_currently_playing_ecs" {
   users_db_table_name                         = local.users_db_table_name
   update_currently_playing_source_bucket_arn  = module.update_currently_playing_source.update_currently_playing_source_bucket_arn
   ecs_instance_public_key                     = var.ecs_instance_public_key
+  update_currently_playing_source_etag        = module.update_currently_playing_source.update_currently_playing_source_etag
 }

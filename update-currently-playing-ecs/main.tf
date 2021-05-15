@@ -71,7 +71,10 @@ resource "aws_iam_role_policy" "update_currently_playing_task_policy" {
 
 resource "aws_ecs_task_definition" "update_currently_playing_task" {
   family                    = "update-currently-playing-task"
-  container_definitions     = templatefile("${path.module}/json/container-definitions.json", { usersDbTableName: var.users_db_table_name })
+  container_definitions     = templatefile("${path.module}/json/container-definitions.json", { 
+    usersDbTableName: var.users_db_table_name,
+    sourceArchiveEtag = var.update_currently_playing_source_etag,
+  })
   requires_compatibilities  = [ "EC2" ]
   task_role_arn             = aws_iam_role.update_currently_playing_task_role.arn
   
@@ -139,7 +142,10 @@ resource "aws_instance" "ecs_instance" {
   iam_instance_profile        = "ecsInstanceRole"
   key_name                    = aws_key_pair.ecs_instance_key_pair.key_name
   ebs_optimized               = "false"
-  user_data                   = templatefile("${path.module}/bash/userdata.bash", { clusterName = aws_ecs_cluster.update_currently_playing_cluster.name, instanceTags = jsonencode({ "\"project\"" = "\"spotify-chat\"" }) })
+  user_data                   = templatefile("${path.module}/bash/userdata.bash", { 
+    clusterName = aws_ecs_cluster.update_currently_playing_cluster.name, 
+    instanceTags = jsonencode({ "\"project\"" = "\"spotify-chat\"" }),
+  })
   vpc_security_group_ids      = [ aws_security_group.ecs_instance_security_group.id ]
   associate_public_ip_address = true
 
