@@ -71,8 +71,24 @@ resource "aws_iam_role_policy" "update_currently_playing_task_policy" {
 }
 
 resource "aws_ecs_task_definition" "update_currently_playing_task" {
-  family                    = "update_currently_playing_task"
+  family                    = "update-currently-playing-task"
   container_definitions     = templatefile("${path.module}/json/container-definitions.json", { usersDbTableName: var.users_db_table_name })
   requires_compatibilities  = [ "EC2" ]
   task_role_arn             = aws_iam_role.update_currently_playing_task_role.arn
+  
+  tags = {
+    project = "spotify-chat"
+  }
+}
+
+resource "aws_ecs_service" "update_currently_playing_service" {
+  name                  = "update-currently-playing-service"
+  task_definition       = aws_ecs_task_definition.update_currently_playing_task.arn
+  scheduling_strategy   = "DAEMON"
+  launch_type           = "EC2"
+  force_new_deployment  = true
+  
+  tags = {
+    project = "spotify-chat"
+  }
 }
