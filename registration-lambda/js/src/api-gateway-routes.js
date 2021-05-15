@@ -46,10 +46,9 @@ async function spotifyAuthSuccess({ event, tokenInfo }) {
     
     const apiKeyUserUriList = await queryByUserUri({ userUri: user.SpotifyUri });
     
-    await Promise.all(
-        apiKeyUserUriList
-            .map(({ ApiKey }) => ApiKey)
-            .map(apiKey => deleteByApiKey({ apiKey })));
+    await apiKeyUserUriList
+        .map(({ ApiKey }) => ApiKey)
+        .reduce((acc, apiKey) => acc.then(() => deleteByApiKey({ apiKey })), Promise.resolve());
 
     const { ApiKey: apiKey } = await createApiKey({ user });
 

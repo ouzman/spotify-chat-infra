@@ -69,6 +69,7 @@ resource "aws_lambda_function" "api_key_authorizer_lambda" {
   function_name = "spotify-chat-api-key-authorizer-lambda"
   role          = aws_iam_role.api_key_authorizer_lambda_role.arn
   handler       = "api-key-authorizer-lambda.handler"
+  timeout       = 60
   
   filename      = "${path.module}/js/dist/api-key-authorizer-lambda.zip"
   source_code_hash = data.archive_file.api_key_authorizer_lambda_archive.output_base64sha256

@@ -78,6 +78,7 @@ resource "aws_lambda_function" "registration_lambda" {
   function_name = "spotify-chat-registration-lambda"
   role          = aws_iam_role.registration_lambda_role.arn
   handler       = "registration-lambda.handler"
+  timeout       = 60
   
   filename      = "${path.module}/js/dist/registration-lambda.zip"
   source_code_hash = data.archive_file.registration_lambda_archive.output_base64sha256

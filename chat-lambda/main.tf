@@ -67,7 +67,8 @@ resource "aws_lambda_function" "chat_lambda" {
   function_name = "spotify-chat-chat-lambda"
   role          = aws_iam_role.chat_lambda_role.arn
   handler       = "chat-lambda.handler"
-  
+  timeout       = 60
+
   filename      = "${path.module}/js/dist/chat-lambda.zip"
   source_code_hash = data.archive_file.chat_lambda_archive.output_base64sha256
 
