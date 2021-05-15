@@ -1,5 +1,6 @@
 [
     {
+        "name": "update-currently-playing",
         "image": "node:latest",
         "requires_compatibilities": "EC2",
         "environment": [
