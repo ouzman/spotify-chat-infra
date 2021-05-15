@@ -1,0 +1,15 @@
+{
+  "name": "update-currently-playing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "update-currently-playing.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.16.0",
+    "node-fetch": "^2.6.1"
+  }
+}

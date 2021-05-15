@@ -71,3 +71,7 @@ module "chat_api" {
   api_key_authorizer_lambda_function_name   = module.api_key_authorizer_lambda.api_key_authorizer_lambda_function_name
   chat_lambda_role_name                     = module.chat_lambda.chat_lambda_role_name
 }
+
+module "update_currently_playing_source" {
+  source = "./update-currently-playing-source"
+}
