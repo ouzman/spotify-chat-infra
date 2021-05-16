@@ -15,9 +15,11 @@ provider "aws" {
 provider "archive" {}
 
 locals {
-  users_db_table_name        = "spotify-chat-users"
-  api_keys_db_table_name     = "spotify-chat-api-keys"
-  api_keys_db_user_uri_index = "user-uri-index"
+  users_db_table_name            = "spotify-chat-users"
+  api_keys_db_table_name         = "spotify-chat-api-keys"
+  api_keys_db_user_uri_index     = "user-uri-index"
+  conenctions_db_table_name      = "spotify-chat-connections"
+  conenctions_db_user_uri_index  = "user-uri-index"
 }
 
 module "users_db" {
@@ -26,9 +28,15 @@ module "users_db" {
 }
 
 module "api_keys_db" {
-  source      = "./api-keys-db"
-  table_name  = local.api_keys_db_table_name
-  user_uri_index = local.api_keys_db_user_uri_index
+  source          = "./api-keys-db"
+  table_name      = local.api_keys_db_table_name
+  user_uri_index  = local.api_keys_db_user_uri_index
+}
+
+module "connections_db" {
+  source         = "./connections-db"
+  table_name     = local.conenctions_db_table_name
+  user_uri_index = local.conenctions_db_user_uri_index
 }
 
 module "spotify_lambda" {
