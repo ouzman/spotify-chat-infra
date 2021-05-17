@@ -1,11 +1,18 @@
 const AWS = require('aws-sdk');
 
+const { log } = require('../util');
+
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
-const { TABLE_NAME, USER_URI_INDEX_NAME } = process.env;
+const { 
+    CONNECTIONS_DB_TABLE_NAME: TABLE_NAME, 
+    CONNECTIONS_DB_USER_URI_INDEX_NAME: USER_URI_INDEX_NAME 
+} = process.env;
 
 exports.findByUseryUri = async ({ userUri }) => {
-    return dynamo.get({
+    log({ method: 'findByUseryUri', params: { userUri } });
+
+    return dynamo.query({
         TableName: TABLE_NAME,
         IndexName: USER_URI_INDEX_NAME,
         KeyConditionExpression: 'UserUri = :uri',
@@ -15,6 +22,8 @@ exports.findByUseryUri = async ({ userUri }) => {
 }
 
 exports.createConnection = async ({ connectionId, userUri }) => {
+    log({ method: 'createConnection', params: { connectionId, userUri } });
+
     return dynamo.update({
         TableName: TABLE_NAME,
         Key: { 'ConnectionId': connectionId },
@@ -31,6 +40,8 @@ exports.createConnection = async ({ connectionId, userUri }) => {
 }
 
 exports.getByConnectionId = async ({ connectionId }) => {
+    log({ method: 'getByConnectionId', params: { connectionId } });
+
     return dynamo.get({
         TableName: TABLE_NAME,
         Key: {
@@ -41,6 +52,8 @@ exports.getByConnectionId = async ({ connectionId }) => {
 }
 
 exports.deleteByConnectionId = async ({ connectionId }) => {
+    log({ method: 'deleteByConnectionId', params: { connectionId } });
+
     return dynamo.delete({
         TableName: TABLE_NAME,
         Key: {

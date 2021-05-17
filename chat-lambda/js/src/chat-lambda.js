@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 
 const { log } = require('./util');
 
-const { findBySpotifyUri, getByConnectionId, createConnection, deleteByConnectionId } = require('./data-source/connections');
+const { findByUseryUri, getByConnectionId, createConnection, deleteByConnectionId } = require('./data-source/connections');
 
 const createEchoMessage = ({ event }) => ({
     connectionId: event.requestContext.connectionId,
@@ -14,9 +14,9 @@ const createEchoMessage = ({ event }) => ({
 
 const routeHandlers = {
     '$connect': async ({ event }) => {
-        const { connectionId, authorizer: { principalId: spotifyUri } } = event.requestContext;
+        const { connectionId, authorizer: { principalId: userUri } } = event.requestContext;
 
-        const connections = await findBySpotifyUri({ spotifyUri });
+        const connections = await findByUseryUri({ userUri });
 
         connections.forEach(connection => {
             // TODO: close connections
