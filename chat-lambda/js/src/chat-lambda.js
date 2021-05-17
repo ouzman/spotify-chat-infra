@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 
 const { log } = require('./util');
 
-const { getBySpotifyUri, setConnectionId } = require('./data-source/users');
+const { findBySpotifyUri, getByConnectionId, createConnection, deleteByConnectionId } = require('./data-source/connections');
 
 const createEchoMessage = ({ event }) => ({
     connectionId: event.requestContext.connectionId,
@@ -16,23 +16,23 @@ const routeHandlers = {
     '$connect': async ({ event }) => {
         const { connectionId, authorizer: { principalId: spotifyUri } } = event.requestContext;
 
-        const user = await getBySpotifyUri({ spotifyUri });
+        const connections = await findBySpotifyUri({ spotifyUri });
 
-        if (!!user.ConnectionId) {
-            // TODO: close connection
-            // TODO: dismiss conversation
-        }
+        connections.forEach(connection => {
+            // TODO: close connections
+            // TODO: dismiss active conversations
+        });
 
-        await setConnectionId({ user, connectionId });
+        await createConnection({ connectionId, userUri });
      },
     '$disconnect': async ({ event }) => { 
-        const { connectionId, authorizer: { principalId: spotifyUri } } = event.requestContext;
+        const { connectionId, authorizer: { principalId: userUri } } = event.requestContext;
 
-        const user = await getBySpotifyUri({ spotifyUri });
+        const connection = await getByConnectionId({ connectionId });
 
-        if (user.ConnectionId === connectionId) {
-            await setConnectionId({ user, connectionId: '' });
-        }
+        // TODO: dismiss active conversation
+
+        await deleteByConnectionId({ connectionId });
     },
     '$default': async ({ event }) => {
         const message = createEchoMessage({ event });

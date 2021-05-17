@@ -50,8 +50,8 @@ data "aws_iam_policy_document" "chat_lambda_policy" {
       "dynamodb:Query",
     ]
     resources = [
-      var.users_db_table_arn,
-      "${var.users_db_table_arn}/index/*",
+      var.connections_db_table_arn,
+      "${var.connections_db_table_arn}/index/*",
     ]
     effect = "Allow"
   }
@@ -76,7 +76,8 @@ resource "aws_lambda_function" "chat_lambda" {
 
   environment {
     variables = {
-      USERS_DB_TABLE_NAME = var.users_db_table_name
+      CONNECTIONS_DB_TABLE_NAME = var.connections_db_table_name
+      CONNECTIONS_DB_USER_URI_INDEX_NAME = var.connections_db_user_uri_index
     }
   }
   tags = {

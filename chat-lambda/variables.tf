@@ -1,7 +1,11 @@
-variable "users_db_table_arn" {
+variable "connections_db_table_arn" {
   type = string
 }
 
-variable "users_db_table_name" {
+variable "connections_db_table_name" {
+  type = string
+}
+
+variable "connections_db_user_uri_index" {
   type = string
 }
