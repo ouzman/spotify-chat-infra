@@ -10,7 +10,9 @@ exports.updateUserNowPlayingBySpotifyUri = async ({ spotifyUri, nowPlaying }) =>
 
     return dynamodb.updateItem({
         TableName: TABLE_NAME,
-        Key: { 'SpotifyUri': spotifyUri },
+        Key: { 
+            'SpotifyUri': { 'S': spotifyUri },
+        },
         UpdateExpression: !!nowPlaying ? 'SET #PLAYING=:nowPlaying' : 'REMOVE #PLAYING',
         ExpressionAttributeNames: {
             '#PLAYING': 'NowPlaying',
@@ -18,9 +20,7 @@ exports.updateUserNowPlayingBySpotifyUri = async ({ spotifyUri, nowPlaying }) =>
         ExpressionAttributeValues: {
             ':nowPlaying': { 'S': nowPlaying },
         },
-        ReturnValues: 'ALL_NEW'
-    })
-    .then(res => res.Attributes);
+    });
 }
 
 exports.updateUserTokensBySpotifyUri = async ({ spotifyUri, accessToken, refreshToken }) => {
@@ -28,7 +28,9 @@ exports.updateUserTokensBySpotifyUri = async ({ spotifyUri, accessToken, refresh
 
     return dynamodb.updateItem({
         TableName: TABLE_NAME,
-        Key: { 'SpotifyUri': spotifyUri },
+        Key: { 
+            'SpotifyUri': { 'S': spotifyUri } 
+        },
         UpdateExpression: 'SET #ACCT=:accessToken, #REFT=:refreshToken',
         ExpressionAttributeNames: {
             '#ACCT': 'AccessToken',
