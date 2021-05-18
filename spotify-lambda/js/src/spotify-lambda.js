@@ -12,5 +12,9 @@ exports.handler = async (event, context) => {
 
     const handler = await handlerFactory({ event });
 
-    return handler({ event });
+    const response = await handler({ event });
+
+    log({ response });
+
+    return response;
 };

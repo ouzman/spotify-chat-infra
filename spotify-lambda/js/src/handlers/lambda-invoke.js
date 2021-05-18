@@ -27,12 +27,12 @@ const eventHandlers = {
         return {
             status: 0,
             context: {
-                tokenDate: tokenResponse.data,
+                tokenData: tokenResponse.data,
             }
         }
     },
     'getUserInfo': async ({ event }) => {
-        const { accessToken } = event.payload;
+        const { accessToken, refreshToken } = event.payload;
 
         const request = new Request(`${SPOTIFY_BASE_URI}/v1/me`, {
             method: 'GET',
