@@ -48,12 +48,11 @@ const task = async () => {
             image: currentlyPlaying.item?.album?.images?.[0] ?? '',
         };
         
-        await UsersDataSource.updateUserNowPlayingBySpotifyUri({ spotifyUri: UserUri, nowPlaying });
-    }
-    
-    const response = await fetch('http://worldclockapi.com/api/json/utc/now');
-    const json = await response.json();
-    console.log({ response: json });
+        const updatedUser = await UsersDataSource.updateUserNowPlayingBySpotifyUri({ spotifyUri: UserUri, nowPlaying });
+        log({ updatedUser });
+
+        log('Task completed')
+    }    
 }
 
 const loop = async () => {
