@@ -1,4 +1,5 @@
 const { Lambda } = require('@aws-sdk/client-lambda');
+const { log } = require('../util');
 
 const lambda = new Lambda({});
 
