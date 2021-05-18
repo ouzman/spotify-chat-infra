@@ -19,6 +19,17 @@ resource "aws_apigatewayv2_integration" "chat_lambda_integration" {
   passthrough_behavior      = "WHEN_NO_MATCH"
 }
 
+resource "aws_apigatewayv2_integration" "natch_lambda_integration" {
+  api_id           = aws_apigatewayv2_api.chat_api.id
+  integration_type = "AWS_PROXY"
+
+  connection_type           = "INTERNET"
+  content_handling_strategy = "CONVERT_TO_TEXT"
+  integration_method        = "POST"
+  integration_uri           = var.match_lambda_invoke_arn
+  passthrough_behavior      = "WHEN_NO_MATCH"
+}
+
 resource "aws_lambda_permission" "chat_lambda_permission" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
@@ -66,6 +77,13 @@ resource "aws_apigatewayv2_route" "default_route" {
   target    = "integrations/${aws_apigatewayv2_integration.chat_lambda_integration.id}"
 }
 
+
+resource "aws_apigatewayv2_route" "match_request_route" {
+  api_id    = aws_apigatewayv2_api.chat_api.id
+  route_key = "MatchRequest"
+  target    = "integrations/${aws_apigatewayv2_integration.natch_lambda_integration.id}"
+}
+
 resource "aws_apigatewayv2_deployment" "default_deployment" {
   api_id      = aws_apigatewayv2_api.chat_api.id
   description = "Default deployment"
@@ -78,7 +96,9 @@ resource "aws_apigatewayv2_deployment" "default_deployment" {
                 jsonencode(aws_apigatewayv2_route.connect_route), 
                 jsonencode(aws_apigatewayv2_route.disconnect_route), 
                 jsonencode(aws_apigatewayv2_route.default_route), 
+                jsonencode(aws_apigatewayv2_route.match_request_route), 
                 var.chat_lambda_invoke_arn,
+                var.match_lambda_invoke_arn,
     )))
   }
 
@@ -98,7 +118,7 @@ resource "aws_apigatewayv2_stage" "default_stage" {
   auto_deploy   = false
 }
 
-data "aws_iam_policy_document" "chat_lambda_policy" {
+data "aws_iam_policy_document" "manage_connections_policy" {
   statement {
     actions = [
       "execute-api:ManageConnections",
@@ -112,10 +132,20 @@ data "aws_iam_policy_document" "chat_lambda_policy" {
 
 resource "aws_iam_policy" "chat_lambda_manage_connections_policy" {
   name   = "spotify_chat_chat_lambda_manage_connections_policy"
-  policy = data.aws_iam_policy_document.chat_lambda_policy.json
+  policy = data.aws_iam_policy_document.manage_connections_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "chat_api_chat_lambda_manage_connections_policy_attachment" {
   role       = var.chat_lambda_role_name
   policy_arn = aws_iam_policy.chat_lambda_manage_connections_policy.arn
+}
+
+resource "aws_iam_policy" "match_lambda_manage_connections_policy" {
+  name   = "spotify_chat_match_lambda_manage_connections_policy"
+  policy = data.aws_iam_policy_document.manage_connections_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "chat_api_match_lambda_manage_connections_policy_attachment" {
+  role       = var.match_lambda_role_name
+  policy_arn = aws_iam_policy.match_lambda_manage_connections_policy.arn
 }

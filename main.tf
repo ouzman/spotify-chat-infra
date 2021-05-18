@@ -77,13 +77,26 @@ module "chat_lambda" {
   connections_db_user_uri_index = local.connections_db_user_uri_index
 }
 
+module "match_lambda" {
+  source                        = "./match-lambda"
+  users_db_table_arn            = module.users_db.users_db_arn
+  users_db_table_name           = local.users_db_table_name
+  spotify_lambda_arn            = module.spotify_lambda.spotify_lambda_arn
+  spotify_lambda_function_name  = module.spotify_lambda.spotify_lambda_function_name
+}
+
 module "chat_api" {
   source = "./chat-api"
   chat_lambda_invoke_arn                    = module.chat_lambda.chat_lambda_invoke_arn
   chat_lambda_function_name                 = module.chat_lambda.chat_lambda_function_name
+  chat_lambda_role_name                     = module.chat_lambda.chat_lambda_role_name
+
+  match_lambda_invoke_arn                   = module.match_lambda.match_lambda_invoke_arn
+  match_lambda_function_name                = module.match_lambda.match_lambda_function_name
+  match_lambda_role_name                    = module.match_lambda.match_lambda_role_name
+
   api_key_authorizer_lambda_invoke_arn      = module.api_key_authorizer_lambda.api_key_authorizer_lambda_invoke_arn
   api_key_authorizer_lambda_function_name   = module.api_key_authorizer_lambda.api_key_authorizer_lambda_function_name
-  chat_lambda_role_name                     = module.chat_lambda.chat_lambda_role_name
 }
 
 module "update_currently_playing_source" {
