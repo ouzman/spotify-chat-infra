@@ -47,7 +47,7 @@ const task = async () => {
         const nowPlaying = {
             name: currentlyPlaying.item?.name ?? 'Unknown Song',
             artist: currentlyPlaying.item?.artists?.map(artist => artist.name)?.join(', ') ?? 'Unknown Artist',
-            image: currentlyPlaying.item?.album?.images?.[0] ?? '',
+            image: currentlyPlaying.item?.album?.images?.[0]?.url ?? '',
         };
         
         const updatedUser = await UsersDataSource.updateUserNowPlayingBySpotifyUri({ spotifyUri: userUri, nowPlaying });
