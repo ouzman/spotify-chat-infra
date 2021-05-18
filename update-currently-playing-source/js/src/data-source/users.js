@@ -6,9 +6,9 @@ const dynamodb = new DynamoDB({});
 const TABLE_NAME = process.env.USERS_DB_TABLE_NAME
 
 exports.updateUserNowPlayingBySpotifyUri = async ({ spotifyUri, nowPlaying }) => {
-    log({ method: 'updateUserNowPlayingBySpotifyUri', params: { spotifyUri, nowPlaying } });
+    // log({ method: 'updateUserNowPlayingBySpotifyUri', params: { spotifyUri, nowPlaying } });
 
-    return dynamodb.update({
+    return dynamodb.updateItem({
         TableName: TABLE_NAME,
         Key: { 'SpotifyUri': spotifyUri },
         UpdateExpression: !!nowPlaying ? 'SET #PLAYING=:nowPlaying' : 'REMOVE #PLAYING',
@@ -24,9 +24,9 @@ exports.updateUserNowPlayingBySpotifyUri = async ({ spotifyUri, nowPlaying }) =>
 }
 
 exports.updateUserTokensBySpotifyUri = async ({ spotifyUri, accessToken, refreshToken }) => {
-    log({ method: 'updateUserTokensBySpotifyUri', params: { spotifyUri, accessToken, refreshToken } });
+    // log({ method: 'updateUserTokensBySpotifyUri', params: { spotifyUri, accessToken, refreshToken } });
 
-    return dynamodb.update({
+    return dynamodb.updateItem({
         TableName: TABLE_NAME,
         Key: { 'SpotifyUri': spotifyUri },
         UpdateExpression: 'SET #ACCT=:accessToken, #REFT=:refreshToken',
@@ -43,13 +43,8 @@ exports.updateUserTokensBySpotifyUri = async ({ spotifyUri, accessToken, refresh
 }
 
 exports.getBySpotifyUri = async ({ spotifyUri }) => {
-    log({ method: 'getBySpotifyUri', params: { spotifyUri } });
+    // log({ method: 'getBySpotifyUri', params: { spotifyUri } });
 
-    return dynamodb.getItem({
-        TableName: TABLE_NAME,
-        Key: {
-            'SpotifyUri': { 'S': spotifyUri }
-        }
-    })
+    return dynamodb.getItem({ TableName: TABLE_NAME, Key: { 'SpotifyUri': { 'S': spotifyUri } } })
     .then(res => res.Item);
 }
