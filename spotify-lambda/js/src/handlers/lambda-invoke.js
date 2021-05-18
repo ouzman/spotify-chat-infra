@@ -89,6 +89,16 @@ const eventHandlers = {
             return networkError({ event, error });
         }
 
+        if (response.status === 204) {
+            return {
+                status: 0,
+                context: {
+                    currentlyPlaying: null,
+                    updatedTokenData,
+                }
+            }
+        }
+
         const responseBody = await response.json();
 
         log({ responseBody });
