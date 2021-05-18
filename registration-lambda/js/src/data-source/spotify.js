@@ -19,3 +19,36 @@ exports.getUserInfo = async ({ accessToken }) => {
         .then(event => event.Payload)
         .then(payload => JSON.parse(payload));
 }
+
+exports.getAuthorizeUrl = async ({ callbackUrl }) => {
+    const payload = {
+        eventType: 'getAuthorizeUrl',
+        payload: {
+            callbackUrl,
+        }
+    };
+
+    return lambda.invoke({
+        FunctionName: FUNCTION_NAME,
+        Payload: JSON.stringify(payload)
+    }).promise()
+        .then(event => event.Payload)
+        .then(payload => JSON.parse(payload));
+}
+
+exports.getToken = async ({ accessToken }) => {
+    const payload = {
+        eventType: 'getToken',
+        payload: {
+            requestUrl,
+            callbackUrl,
+        }
+    };
+
+    return lambda.invoke({
+        FunctionName: FUNCTION_NAME,
+        Payload: JSON.stringify(payload)
+    }).promise()
+        .then(event => event.Payload)
+        .then(payload => JSON.parse(payload));
+}

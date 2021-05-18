@@ -8,7 +8,5 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "client-oauth2": "^4.3.3"
-  }
+  "dependencies": {}
 }

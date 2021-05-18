@@ -10,6 +10,18 @@
             {
                 "name": "USER_DB_TABLE_NAME",
                 "value": "${usersDbTableName}"
+            },
+            {
+                "name": "CONNECTIONS_DB_TABLE_NAME",
+                "value": "${connectionsDbTableName}"
+            },
+            {
+                "name": "CONNECTIONS_DB_USER_URI_INDEX_NAME",
+                "value": "${connectionsDbUserUriIndexName}"
+            },
+            {
+                "name": "SPOTIFY_LAMBDA_FUNCTION_NAME",
+                "value": "${spotifyLambdaFunctionName}"
             }
         ],
         "command": [

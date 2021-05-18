@@ -46,6 +46,8 @@ data "aws_iam_policy_document" "update_currently_playing_task_policy" {
     resources = [
       var.users_db_table_arn,
       "${var.users_db_table_arn}/index/*",    
+      var.connections_db_table_arn,
+      "${var.connections_db_table_arn}/index/*",    
     ]
     effect = "Allow"
   }
@@ -61,6 +63,16 @@ data "aws_iam_policy_document" "update_currently_playing_task_policy" {
     ]
     effect = "Allow"
   }
+
+  statement {
+    actions = [
+      "lambda:InvokeFunction",
+    ]
+    resources = [
+      "${var.spotify_lambda_arn}",
+    ]
+    effect = "Allow"
+  }
 }
 
 resource "aws_iam_role_policy" "update_currently_playing_task_policy" {
@@ -72,8 +84,11 @@ resource "aws_iam_role_policy" "update_currently_playing_task_policy" {
 resource "aws_ecs_task_definition" "update_currently_playing_task" {
   family                    = "update-currently-playing-task"
   container_definitions     = templatefile("${path.module}/json/container-definitions.json", { 
-    usersDbTableName: var.users_db_table_name,
-    sourceArchiveEtag = var.update_currently_playing_source_etag,
+    usersDbTableName              = var.users_db_table_name,
+    connectionsDbTableName        = var.connections_db_table_name,
+    connectionsDbUserUriIndexName = var.connections_db_user_uri_index,
+    sourceArchiveEtag             = var.update_currently_playing_source_etag,
+    spotifyLambdaFunctionName     = var.spotify_lambda_function_name,
   })
   requires_compatibilities  = [ "EC2" ]
   task_role_arn             = aws_iam_role.update_currently_playing_task_role.arn

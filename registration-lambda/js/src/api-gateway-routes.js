@@ -1,7 +1,6 @@
 const { log } = require('./util');
 
-const { getAuthorizeUrl, getToken } = require('./spotify-authorizer');
-const { getUserInfo } = require('./data-source/spotify')
+const { getUserInfo, getAuthorizeUrl, getToken } = require('./data-source/spotify')
 const { upsertUser, getBySpotifyUri } = require('./data-source/users');
 const { createApiKey, queryByUserUri, deleteByApiKey } = require('./data-source/apiKeys');
 
@@ -10,15 +9,17 @@ const getRequestUrl = ({ event }) => `https://${event.requestContext.domainName}
 
 const routeHandlers = {
     'GET /login': async ({ event }) => {
+        const { context: { url } } = await getAuthorizeUrl({ callbackUrl: generateCallbackUrl({ event }) });
+
         return {
             statusCode: 302,
             headers: {
-                'location': await getAuthorizeUrl({ callbackUrl: generateCallbackUrl({ event }) }),
+                'location': url,
             },
         }
     },
     'GET /callback': async ({ event }) => {
-        const { data: tokenInfo } = await getToken({
+        const { context: { tokenData: tokenInfo } } = await getToken({
             requestUrl: getRequestUrl({ event }),
             callbackUrl: generateCallbackUrl({ event }),
         });
@@ -30,7 +31,7 @@ const routeHandlers = {
 }
 
 async function spotifyAuthSuccess({ event, tokenInfo }) {
-    const spotifyUserResponse = await getUserInfo({ accessToken: tokenInfo['access_token'] });
+    const spotifyUserResponse = await getUserInfo({ accessToken: tokenInfo['access_token'], refreshToken: tokenInfo['refresh_token'] });
 
     log({ spotifyUserResponse });
 
@@ -38,9 +39,11 @@ async function spotifyAuthSuccess({ event, tokenInfo }) {
         return businessError({ event, errorMessage: spotifyUserResponse.errorMessage })
     }
 
-    const { spotifyUser } = spotifyUserResponse.context;
-
-    const user = await upsertUser({ tokenInfo, spotifyUser });
+    const { spotifyUser, updatedTokenInfo } = spotifyUserResponse.context;
+    
+    const upToDateTokenInfo = updatedTokenInfo || tokenInfo;
+    
+    const user = await upsertUser({ tokenInfo: upToDateTokenInfo, spotifyUser });
 
     log({ user });
     

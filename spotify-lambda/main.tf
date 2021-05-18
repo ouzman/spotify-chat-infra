@@ -53,12 +53,18 @@ resource "aws_lambda_function" "spotify_lambda" {
   role          = aws_iam_role.spotify_lambda_role.arn
   handler       = "spotify-lambda.handler"
   timeout       = 60
-  
+
   filename      = "${path.module}/js/dist/spotify-lambda.zip"
   source_code_hash = data.archive_file.spotify_lambda_archive.output_base64sha256
 
   runtime = "nodejs12.x"
 
+  environment {
+    variables = {
+      SPOTIFY_CLIENT_ID = var.spotify_client_id,
+      SPOTIFY_CLIENT_SECRET = var.spotify_client_secret,
+    }
+  }
   tags = {
     project = "spotify-chat"
   }

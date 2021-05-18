@@ -40,13 +40,13 @@ module "connections_db" {
 }
 
 module "spotify_lambda" {
-  source = "./spotify-lambda"
+  source                = "./spotify-lambda"
+  spotify_client_id     = var.spotify_client_id
+  spotify_client_secret = var.spotify_client_secret
 }
 
 module "registration_lambda" {
   source                        = "./registration-lambda"
-  spotify_client_id             = var.spotify_client_id
-  spotify_client_secret         = var.spotify_client_secret
   users_db_table_arn            = module.users_db.users_db_arn
   users_db_table_name           = local.users_db_table_name
   api_keys_db_table_arn         = module.api_keys_db.api_keys_db_arn
@@ -97,4 +97,9 @@ module "update_currently_playing_ecs" {
   update_currently_playing_source_bucket_arn  = module.update_currently_playing_source.update_currently_playing_source_bucket_arn
   ecs_instance_public_key                     = var.ecs_instance_public_key
   update_currently_playing_source_etag        = module.update_currently_playing_source.update_currently_playing_source_etag
+  connections_db_table_arn                    = module.connections_db.connections_db_arn
+  connections_db_table_name                   = local.connections_db_table_name
+  connections_db_user_uri_index               = local.connections_db_user_uri_index
+  spotify_lambda_arn                          = module.spotify_lambda.spotify_lambda_arn
+  spotify_lambda_function_name                = module.spotify_lambda.spotify_lambda_function_name
 }
