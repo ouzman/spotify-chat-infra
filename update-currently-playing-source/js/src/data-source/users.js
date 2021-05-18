@@ -1,11 +1,13 @@
 const { DynamoDB } = require('@aws-sdk/client-dynamodb');
 const { log } = require('../util');
 
-const dynamodb = new DynamoDB();
+const dynamodb = new DynamoDB({});
 
 const TABLE_NAME = process.env.USERS_DB_TABLE_NAME
 
 exports.updateUserNowPlayingBySpotifyUri = async ({ spotifyUri, nowPlaying }) => {
+    log({ method: 'updateUserNowPlayingBySpotifyUri', params: { spotifyUri, nowPlaying } });
+
     return dynamodb.update({
         TableName: TABLE_NAME,
         Key: { 'SpotifyUri': spotifyUri },
@@ -22,6 +24,8 @@ exports.updateUserNowPlayingBySpotifyUri = async ({ spotifyUri, nowPlaying }) =>
 }
 
 exports.updateUserTokensBySpotifyUri = async ({ spotifyUri, accessToken, refreshToken }) => {
+    log({ method: 'updateUserTokensBySpotifyUri', params: { spotifyUri, accessToken, refreshToken } });
+
     return dynamodb.update({
         TableName: TABLE_NAME,
         Key: { 'SpotifyUri': spotifyUri },
@@ -39,6 +43,8 @@ exports.updateUserTokensBySpotifyUri = async ({ spotifyUri, accessToken, refresh
 }
 
 exports.getBySpotifyUri = async ({ spotifyUri }) => {
+    log({ method: 'getBySpotifyUri', params: { spotifyUri } });
+
     return dynamodb.getItem({
         TableName: TABLE_NAME,
         Key: {
