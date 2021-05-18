@@ -18,9 +18,9 @@ const task = async () => {
     for (const connection of connections) {
         log({ connection });
 
-        const { UserUri } = connection;
+        const { UserUri: { S: userUri } } = connection;
         
-        const user = UsersDataSource.getBySpotifyUri({ spotifyUri: UserUri });
+        const user = await UsersDataSource.getBySpotifyUri({ spotifyUri: userUri });
         log({ user });
 
         if (!user) {
@@ -28,7 +28,9 @@ const task = async () => {
             return;
         }
 
-        const currentlyPlayingResponse = await SpotifyDataSource.getCurrentlyPlaying({ accessToken: user.AccessToken, refreshToken: user.refreshToken });
+        const { AccessToken: { S: accessToken }, RefreshToken: { S: refreshToken } } = user;
+
+        const currentlyPlayingResponse = await SpotifyDataSource.getCurrentlyPlaying({ accessToken, refreshToken });
         log({ currentlyPlayingResponse });
 
         if (currentlyPlayingResponse.status !== 0) {
@@ -39,7 +41,7 @@ const task = async () => {
         
         if (!!updatedTokenData) {
             log('Token information changed, updating...')
-            await UsersDataSource.updateUserTokensBySpotifyUri({ spotifyUri: UserUri, accessToken: updatedTokenData['access_token'], refreshToken: updatedTokenData['refresh_token'] });
+            await UsersDataSource.updateUserTokensBySpotifyUri({ spotifyUri: userUri, accessToken: updatedTokenData['access_token'], refreshToken: updatedTokenData['refresh_token'] });
         }
 
         const nowPlaying = {
@@ -48,7 +50,7 @@ const task = async () => {
             image: currentlyPlaying.item?.album?.images?.[0] ?? '',
         };
         
-        const updatedUser = await UsersDataSource.updateUserNowPlayingBySpotifyUri({ spotifyUri: UserUri, nowPlaying });
+        const updatedUser = await UsersDataSource.updateUserNowPlayingBySpotifyUri({ spotifyUri: userUri, nowPlaying });
         log({ updatedUser });
 
         log('Task completed')
