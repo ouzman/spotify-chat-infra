@@ -1,7 +1,7 @@
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDB } = require('@aws-sdk/client-dynamodb');
 const { log } = require('../util');
 
-const dynamodb = new DynamoDBClient();
+const dynamodb = new DynamoDB({});
 
 const { 
     CONNECTIONS_DB_TABLE_NAME: TABLE_NAME, 
@@ -13,6 +13,6 @@ exports.findAll = async ({ }) => {
 
     return dynamodb.scan({
         TableName: TABLE_NAME,
-    }).promise()
-        .then(res => res.Items);
+    })
+    .then(res => res.Items);
 }
