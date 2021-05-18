@@ -17,6 +17,6 @@ exports.getCurrentlyPlaying = async ({ accessToken, refreshToken }) => {
         FunctionName: FUNCTION_NAME,
         Payload: JSON.stringify(payload)
     })
-    .then(event => event.Payload)
+    .then(event => { log({ event }); return event.Payload })
     .then(payload => JSON.parse(payload));
 }
