@@ -113,13 +113,12 @@ async function fetchWithRefreshTokenRetry ({ request, accessToken, refreshToken 
     if (response.status === 401 && response.headers.get('www-authenticate').includes('error_description="The access token expired"')) {
         const { data: updatedTokenData } = await SpotifyAuthorizer.refreshToken({ accessToken, refreshToken });
 
-        const newRequest = {
-            ...request,
+        const newRequest = new Request(request, {
             headers: {
-                ...request.headers,
+                ...request.headers.raw(),
                 authorization: `Bearer ${updatedTokenData['access_token']}`,
             }
-        }
+        });
 
         const newResponse = await fetch(newRequest);
 
