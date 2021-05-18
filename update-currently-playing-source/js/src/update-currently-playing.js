@@ -1,6 +1,5 @@
 const fetch = require('node-fetch');
 const { promisify } = require('util');
-const { DynamoDBClient, GetItem } = require('@aws-sdk/client-dynamodb');
 const { log } = require('./util');
 
 const UsersDataSource = require('./data-source/users');

@@ -1,6 +1,6 @@
-const AWS = require('aws-sdk');
+const { LambdaClient } = require('@aws-sdk/client-lambda');
 
-const lambda = new AWS.Lambda();
+const lambda = new LambdaClient({});
 
 const FUNCTION_NAME = process.env.SPOTIFY_LAMBDA_FUNCTION_NAME;
 

@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.16.0",
+    "@aws-sdk/client-lambda": "^3.16.0",
     "node-fetch": "^2.6.1"
   }
 }
