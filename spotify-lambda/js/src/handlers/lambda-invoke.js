@@ -10,7 +10,7 @@ const eventHandlers = {
     'getToken': async ({ event }) => {
         const { callbackUrl } = event.payload;
 
-        const url = await getAuthorizeUrl({ callbackUrl });
+        const url = await SpotifyAuthorizer.getAuthorizeUrl({ callbackUrl });
 
         return {
             status: 0,
@@ -22,7 +22,7 @@ const eventHandlers = {
     'getAuthorizeUrl': async ({ event }) => {
         const { requestUrl, callbackUrl } = event.payload;
         
-        const tokenResponse = await getToken({ requestUrl, callbackUrl });
+        const tokenResponse = await SpotifyAuthorizer.getToken({ requestUrl, callbackUrl });
 
         return {
             status: 0,

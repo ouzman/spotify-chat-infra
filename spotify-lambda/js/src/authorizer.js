@@ -12,4 +12,4 @@ exports.getAuthorizeUrl = async ({ callbackUrl }) => spotifyAuth.code.getUri({ r
 
 exports.getToken = async ({ requestUrl, callbackUrl }) => spotifyAuth.code.getToken(requestUrl, { redirectUri: callbackUrl });
 
-exports.refreshToken = async ({ accessToken, refreshToken }) => spotifyAuth.createToken(accessToken, refreshToken);
+exports.refreshToken = async ({ accessToken, refreshToken }) => spotifyAuth.createToken(accessToken, refreshToken).refresh();
