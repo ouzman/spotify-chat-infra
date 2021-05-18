@@ -71,7 +71,7 @@ data "aws_iam_policy_document" "update_currently_playing_task_policy" {
       "lambda:InvokeFunction",
     ]
     resources = [
-      "${var.spotify_lambda_arn}",
+      var.spotify_lambda_arn,
     ]
     effect = "Allow"
   }
