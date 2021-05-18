@@ -1,3 +1,5 @@
+data "aws_region" "current" {}
+
 data "aws_iam_policy_document" "update_currently_playing_task_role_policy" {
   statement {
     actions = [
@@ -89,6 +91,7 @@ resource "aws_ecs_task_definition" "update_currently_playing_task" {
     connectionsDbUserUriIndexName = var.connections_db_user_uri_index,
     sourceArchiveEtag             = var.update_currently_playing_source_etag,
     spotifyLambdaFunctionName     = var.spotify_lambda_function_name,
+    region                        = data.aws_region.current.name,
   })
   requires_compatibilities  = [ "EC2" ]
   task_role_arn             = aws_iam_role.update_currently_playing_task_role.arn
