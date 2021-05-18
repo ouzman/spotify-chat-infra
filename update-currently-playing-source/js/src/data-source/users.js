@@ -22,7 +22,7 @@ exports.updateUserNowPlayingBySpotifyUri = async ({ spotifyUri, nowPlaying }) =>
             UpdateExpression: 'SET #PLAYING=:nowPlaying',
             ExpressionAttributeNames: { '#PLAYING': 'NowPlaying' },
             ExpressionAttributeValues: {
-                nowPlaying: {
+                ':nowPlaying': {
                     'M': {
                         name: { 'S': nowPlaying.name },
                         artist: { 'S': nowPlaying.artist },
