@@ -39,7 +39,7 @@ exports.updateUserTokensBySpotifyUri = async ({ spotifyUri, accessToken, refresh
 }
 
 exports.getBySpotifyUri = async ({ spotifyUri }) => {
-    return dynamodb.get({
+    return dynamodb.getItem({
         TableName: TABLE_NAME,
         Key: {
             'SpotifyUri': spotifyUri
