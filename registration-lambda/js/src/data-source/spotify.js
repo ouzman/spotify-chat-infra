@@ -36,7 +36,7 @@ exports.getAuthorizeUrl = async ({ callbackUrl }) => {
         .then(payload => JSON.parse(payload));
 }
 
-exports.getToken = async ({ accessToken }) => {
+exports.getToken = async ({ requestUrl, callbackUrl }) => {
     const payload = {
         eventType: 'getToken',
         payload: {
