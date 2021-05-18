@@ -7,7 +7,7 @@ const { log } = require('../util');
 const SPOTIFY_BASE_URI = 'https://api.spotify.com';
 
 const eventHandlers = {
-    'getToken': async ({ event }) => {
+    'getAuthorizeUrl': async ({ event }) => {
         const { callbackUrl } = event.payload;
 
         const url = await SpotifyAuthorizer.getAuthorizeUrl({ callbackUrl });
@@ -19,7 +19,7 @@ const eventHandlers = {
             }
         }
     },
-    'getAuthorizeUrl': async ({ event }) => {
+    'getToken': async ({ event }) => {
         const { requestUrl, callbackUrl } = event.payload;
         
         const tokenResponse = await SpotifyAuthorizer.getToken({ requestUrl, callbackUrl });
