@@ -8,23 +8,31 @@ const TABLE_NAME = process.env.USERS_DB_TABLE_NAME
 exports.updateUserNowPlayingBySpotifyUri = async ({ spotifyUri, nowPlaying }) => {
     log({ method: 'updateUserNowPlayingBySpotifyUri', params: { spotifyUri, nowPlaying } });
 
-    return dynamodb.updateItem({
-        TableName: TABLE_NAME,
-        Key: { 
-            'SpotifyUri': { 'S': spotifyUri },
-        },
-        UpdateExpression: !!nowPlaying ? 'SET #PLAYING=:nowPlaying' : 'REMOVE #PLAYING',
-        ExpressionAttributeNames: {
-            '#PLAYING': 'NowPlaying',
-        },
-        ExpressionAttributeValues: {
-            nowPlaying: {
-                name: { 'S': nowPlaying.name },
-                artist: { 'S': nowPlaying.artist },
-                image: { 'S': nowPlaying.image },    
-            }
-        },
-    });
+    if (!nowPlaying) {
+        return dynamodb.updateItem({
+            TableName: TABLE_NAME,
+            Key: { 'SpotifyUri': { 'S': spotifyUri } },
+            UpdateExpression: 'REMOVE #PLAYING',
+            ExpressionAttributeNames: { '#PLAYING': 'NowPlaying' },
+        });    
+    } else {
+        return dynamodb.updateItem({
+            TableName: TABLE_NAME,
+            Key: { 'SpotifyUri': { 'S': spotifyUri } },
+            UpdateExpression: 'SET #PLAYING=:nowPlaying',
+            ExpressionAttributeNames: { '#PLAYING': 'NowPlaying' },
+            ExpressionAttributeValues: {
+                nowPlaying: {
+                    'M': {
+                        name: { 'S': nowPlaying.name },
+                        artist: { 'S': nowPlaying.artist },
+                        image: { 'S': nowPlaying.image },    
+                    }
+                }
+            },
+        });    
+    }
+
 }
 
 exports.updateUserTokensBySpotifyUri = async ({ spotifyUri, accessToken, refreshToken }) => {
