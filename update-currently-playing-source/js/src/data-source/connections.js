@@ -9,7 +9,7 @@ const {
 } = process.env;
 
 exports.findAll = async ({ }) => {
-    // log({ method: 'findAll', params: { } });
+    log({ method: 'findAll', params: { } });
 
     return dynamodb.scan({
         TableName: TABLE_NAME,
