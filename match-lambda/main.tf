@@ -51,16 +51,8 @@ data "aws_iam_policy_document" "match_lambda_policy" {
     resources = [
       var.users_db_table_arn,
       "${var.users_db_table_arn}/index/*",    
-    ]
-    effect = "Allow"
-  }
-
-  statement {
-    actions = [
-      "lambda:InvokeFunction",
-    ]
-    resources = [
-      var.spotify_lambda_arn,
+      var.match_requests_db_table_arn,
+      "${var.match_requests_db_table_arn}/index/*",    
     ]
     effect = "Allow"
   }
@@ -86,7 +78,7 @@ resource "aws_lambda_function" "match_lambda" {
   environment {
     variables = {
       USERS_DB_TABLE_NAME = var.users_db_table_name,
-      SPOTIFY_LAMBDA_FUNCTION_NAME = var.spotify_lambda_function_name,
+      MATCH_REQUESTS_DB_TABLE_NAME = var.match_requests_db_table_name,
     }
   }
   tags = {

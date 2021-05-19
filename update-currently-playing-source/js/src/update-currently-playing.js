@@ -44,10 +44,11 @@ const task = async () => {
             await UsersDataSource.updateUserTokensBySpotifyUri({ spotifyUri: userUri, accessToken: updatedTokenData['access_token'], refreshToken: updatedTokenData['refresh_token'] });
         }
 
-        const nowPlaying = currentlyPlaying && {
-            name: currentlyPlaying.item?.name ?? 'Unknown Song',
-            artist: currentlyPlaying.item?.artists?.map(artist => artist.name)?.join(', ') ?? 'Unknown Artist',
-            image: currentlyPlaying.item?.album?.images?.[0]?.url ?? '',
+        const nowPlaying = currentlyPlaying?.item?.id && {
+            id: currentlyPlaying.item.id, // required
+            name: currentlyPlaying.item.name ?? 'Unknown Song',
+            artist: currentlyPlaying.item.artists?.map(artist => artist.name)?.join(', ') ?? 'Unknown Artist',
+            image: currentlyPlaying.item.album?.images?.[0]?.url ?? '',
         };
         
         const updatedUser = await UsersDataSource.updateUserNowPlayingBySpotifyUri({ spotifyUri: userUri, nowPlaying });

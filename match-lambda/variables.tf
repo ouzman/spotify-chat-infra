@@ -6,10 +6,10 @@ variable "users_db_table_name" {
     type = string
 }
 
-variable "spotify_lambda_arn" {
+variable "match_requests_db_table_arn" {
     type = string
 }
 
-variable "spotify_lambda_function_name" {
+variable "match_requests_db_table_name" {
     type = string
 }

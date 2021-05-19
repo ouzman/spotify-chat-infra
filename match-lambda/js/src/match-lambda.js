@@ -1,27 +1,33 @@
 const AWS = require('aws-sdk');
 
 const { log } = require('./util');
-
-const createEchoMessage = ({ event }) => ({
-    connectionId: event.requestContext.connectionId,
-    type: 'ECHO',
-    context: {
-        requestBody: JSON.parse(event.body),
-    }
-})
+const UsersDataSource = require('./data-source/users');
+const MatchRequestsDataSource = require('./data-source/match-requests');
 
 const routeHandlers = {
     'MatchRequest': async ({ event }) => {
-        const message = createEchoMessage({ event });
+        const { requestContext: { authorizer: { principalId: userUri } } } = event;
+        
+        const user = await UsersDataSource.getBySpotifyUri({ spotifyUri: userUri });
 
-        const managementApi = new AWS.ApiGatewayManagementApi({ 
-            endpoint: `https://${event.requestContext.domainName}/${event.requestContext.stage}`,
-        });
+        if (!user) {
+            console.log(`User cannot found. UserUri: ${userUri}`)
+            return
+        }
 
-        const response = await managementApi.postToConnection({
-            ConnectionId: message.connectionId,
-            Data: JSON.stringify({ message }),
-        }).promise();
+        if (!user.NowPlaying) {
+            console.log("User isn't listening any song right now.")
+            return
+        }
+
+        const { id: songId } = user.NowPlaying;
+
+        const foundMatchRequest = await MatchRequestsDataSource.popMatchRequest({ songId, prohibitedUserUri: userUri, requestDateRangeFromNowInSeconds: 10 });
+
+        if (foundMatchRequest) {
+            // TODO: create a new conversation
+            return;
+        }
 
         log({ message, response });
     }

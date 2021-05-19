@@ -20,6 +20,7 @@ locals {
   api_keys_db_user_uri_index     = "user-uri-index"
   connections_db_table_name      = "spotify-chat-connections"
   connections_db_user_uri_index  = "user-uri-index"
+  match_requests_db_table_name   = "spotify-chat-matches"
 }
 
 module "users_db" {
@@ -77,12 +78,17 @@ module "chat_lambda" {
   connections_db_user_uri_index = local.connections_db_user_uri_index
 }
 
+module "match_requests_db" {
+  source      = "./match-requests-db"
+  table_name  = local.match_requests_db_table_name
+}
+
 module "match_lambda" {
   source                        = "./match-lambda"
   users_db_table_arn            = module.users_db.users_db_arn
   users_db_table_name           = local.users_db_table_name
-  spotify_lambda_arn            = module.spotify_lambda.spotify_lambda_arn
-  spotify_lambda_function_name  = module.spotify_lambda.spotify_lambda_function_name
+  match_requests_db_table_arn   = module.match_requests_db.matches_db_arn
+  match_requests_db_table_name  = local.match_requests_db_table_name
 }
 
 module "chat_api" {

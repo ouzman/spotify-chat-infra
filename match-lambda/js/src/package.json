@@ -8,5 +8,8 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {}
+  "dependencies": {
+    "aws-sdk": "^2.909.0",
+    "luxon": "^1.27.0"
+  }
 }
