@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk');
+const { DateTime } = require('luxon');
 
 const { log } = require('./util');
 const UsersDataSource = require('./data-source/users');
@@ -25,13 +26,16 @@ const routeHandlers = {
         const { id: songId } = user.NowPlaying;
 
         const foundMatchRequest = await MatchRequestsDataSource.popMatchRequest({ songId, prohibitedUserUri: userUri, requestDateRangeFromNowInSeconds: 10 });
+        log({ foundMatchRequest });
 
         if (foundMatchRequest) {
             // TODO: create a new conversation
             return;
         }
+        const requestDate = DateTime.now().setZone('UTC').toISO();
 
-        log({ message, response });
+        const newMatchRequest = await MatchRequestsDataSource.upsertMatchRequest({ songId, requestDate, userUri });
+        log({ newMatchRequest });
     }
 }
 

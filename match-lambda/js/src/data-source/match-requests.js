@@ -43,7 +43,7 @@ exports.popMatchRequest = async ({ songId, prohibitedUserUri, requestDateRangeFr
         .then(res => res.Attributes)
         .catch(e => {
             if (e.code === 'ConditionalCheckFailedException') {
-                return { };
+                return null;
             } else {
                 throw e;
             }
