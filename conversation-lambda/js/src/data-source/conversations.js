@@ -50,12 +50,13 @@ exports.addNewMessage = async ({ conversationId, actorId, messageId, messageCont
     await dynamo.update({
         TableName: TABLE_NAME,
         Key: { 'Id': generateId() },
-        UpdateExpression: 'SET #MSGS=list_append(#MSGS, :newMessages)',
+        UpdateExpression: 'SET #MSGS=list_append(if_not_exists(#MSGS, :empty_list), :newMessages)',
         ExpressionAttributeNames: {
             '#MSGS': 'Messages',
         },
         ExpressionAttributeValues: {
-            ':messages': [message],
+            ':newMessages': [message],
+            ':empty_list': [],
         },
         ReturnValues: 'ALL_NEW'
     }).promise();

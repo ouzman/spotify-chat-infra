@@ -57,15 +57,15 @@ async function spotifyAuthSuccess({ event, tokenInfo }) {
 
     log({ apiKey });
 
-    return apiKeyResponse({ apiKey });
+    return apiKeyResponse({ apiKey, userId: user.SpotifyUri });
 }
 
-function apiKeyResponse({ apiKey }) {
+function apiKeyResponse({ apiKey, userId }) {
     return {
         statusCode: 302,
         headers: {
             'content-type': 'application/json',
-            'location': `spotify-chat://auth?apikey=${apiKey}`,
+            'location': `spotify-chat://auth?apikey=${apiKey}&userId=${userId}`,
         }
     };
 }

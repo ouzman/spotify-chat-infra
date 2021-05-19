@@ -7,7 +7,7 @@ const managementApi = new AWS.ApiGatewayManagementApi({ endpoint: process.env.CH
 
 const UsersDataSource = require('./data-source/users');
 const SpotifyDataSource = require('./data-source/spotify');
-const ConversatiosnDataSource = require('./data-source/conversations');
+const ConversationDataSource = require('./data-source/conversations');
 const ConnectionsDataSource = require('./data-source/connections');
 
 const eventHandlers = {
@@ -55,7 +55,7 @@ const eventHandlers = {
         const users = Users
             .map(User => userModel({ User }))
 
-        const Conversation = await ConversatiosnDataSource.createConversation({ song, users });
+        const Conversation = await ConversationDataSource.createConversation({ song, users });
         log({ Conversation })
 
         await sendToClients({ userUris, messageContent: eventSuccessResponse({ action: 'NewConversation', data: { conversation: conversationModel({ Conversation }) } }) })
@@ -103,8 +103,9 @@ const actionHandlers = {
     'GetConversations': async ({ event }) => { },
     'GetMessages': async ({ event }) => { },
     'SendMessage': async ({ event }) => {
-        const { requestContext: { authorizer: { principalId: userUri } }, body: { conversation, message } } = event;
-        log({ userUri, conversation, message });
+        const { requestContext: { authorizer: { principalId: userUri } }, body: { data: { conversation: conversationId, message } } } = event;
+        log({ event });
+        log({ userUri, conversationId, message });
 
         const user = await UsersDataSource.getBySpotifyUri({ spotifyUri: userUri });
         log({ user });
@@ -114,25 +115,25 @@ const actionHandlers = {
             return
         }
 
-        const conversation = await ConversatiosnDataSource.getById({ connectionId });
-        log({ conversation });
+        const Conversation = await ConversationDataSource.getById({ conversationId });
+        log({ Conversation });
 
-        if (!conversation) {
-            log({ message: 'Conversation cannot be found', conversation })
+        if (!Conversation) {
+            log({ message: 'Conversation cannot be found', conversationId })
             return
         }
 
-        const userBelongsToConversation = conversation.Users.map(user => user.id).includes(userUri);
+        const userBelongsToConversation = Conversation.Users.map(user => user.id).includes(userUri);
         if (!userBelongsToConversation) {
-            log({ message: 'User doesn\'t belong to the conversation', userUri, conversation });
+            log({ message: 'User doesn\'t belong to the conversation', userUri, Conversation });
             return
         }
 
         const { id: messageId, content: messageContent } = message;
 
-        const persistedMessage = await ConversatiosnDataSource.addNewMessage({ conversationId, actorId: userUri, messageId, messageContent });
+        const persistedMessage = await ConversationDataSource.addNewMessage({ conversationId, actorId: userUri, messageId, messageContent });
 
-        const userUris = conversation.Users.map(u => u.id);
+        const userUris = Conversation.Users.map(u => u.id);
 
         await sendToClients({ userUris, messageContent: eventSuccessResponse({ action: 'NewMessage', data: { conversationId, message: persistedMessage } }) });
     },
