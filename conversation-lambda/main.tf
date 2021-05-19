@@ -53,6 +53,8 @@ data "aws_iam_policy_document" "conversation_lambda_policy" {
       "${var.users_db_table_arn}/index/*",
       var.conversations_db_table_arn,
       "${var.conversations_db_table_arn}/index/*",
+      var.connections_db_table_arn,
+      "${var.connections_db_table_arn}/index/*",
     ]
     effect = "Allow"
   }
@@ -90,6 +92,8 @@ resource "aws_lambda_function" "conversation_lambda" {
       USERS_DB_TABLE_NAME = var.users_db_table_name,
       CONVERSATIONS_DB_TABLE_NAME = var.conversations_db_table_name,
       SPOTIFY_LAMBDA_FUNCTION_NAME = var.spotify_lambda_function_name,
+      CONNECTIONS_DB_TABLE_NAME = var.connections_db_table_name
+      CONNECTIONS_DB_USER_URI_INDEX_NAME = var.connections_db_user_uri_index
     }
   }
   tags = {

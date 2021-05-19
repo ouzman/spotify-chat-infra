@@ -5,6 +5,7 @@ const { log } = require('./util');
 const UsersDataSource = require('./data-source/users');
 const SpotifyDataSource = require('./data-source/spotify');
 const ConversatiosnDataSource = require('./data-source/conversations');
+const ConnectionsDataSource = require('./data-source/connections');
 
 const eventHandlers = {
     'CreateConversation': async ({ event }) => {
@@ -16,7 +17,7 @@ const eventHandlers = {
         );
 
         const apiUser = users[0];
-        
+
         const { AccessToken: accessToken, RefreshToken: refreshToken } = apiUser;
 
         const songResponse = await SpotifyDataSource.getSong({
@@ -28,7 +29,7 @@ const eventHandlers = {
 
         if (songResponse.status !== 0) {
             log({ message: 'Couldn\'t get song details', songId });
-            
+
             return eventErrorResponse({
                 status: songResponse.status,
                 errorMessage: 'Couldn\'t get song details',
@@ -39,7 +40,7 @@ const eventHandlers = {
         }
 
         const { context: { song, updatedTokenData } } = currentlyPlayingResponse;
-        
+
         if (!!updatedTokenData) {
             log('Token information changed, updating...')
             await UsersDataSource.updateUserTokensBySpotifyUri({ spotifyUri: apiUser.userUri, accessToken: updatedTokenData['access_token'], refreshToken: updatedTokenData['refresh_token'] });
@@ -64,6 +65,9 @@ const eventHandlers = {
             users: usersAttribute,
         });
 
+        const userUris = users.map(u => u.SpotifyUri);
+        sendToClients({ event, userUris, messageContent: { conversation } })
+
         return {
             status: 0,
             context: {
@@ -73,9 +77,31 @@ const eventHandlers = {
     },
 }
 
+const sendToClients = async ({ event, userUris, messageContent }) => {
+    const connections = Promise.all(
+        userUris
+            .map(userUri => ConnectionsDataSource.findByUseryUri({ userUri }))
+    );
+
+    const managementApi = new AWS.ApiGatewayManagementApi({
+        endpoint: `https://${event.requestContext.domainName}/${event.requestContext.stage}`,
+    });
+
+    await Promise.all(
+        connections
+        .map(connection => connection.ConnectionId)
+        .map(connectionId =>
+            managementApi.postToConnection({
+                ConnectionId: connectionId,
+                Data: JSON.stringify(messageContent),
+            }).promise()
+        )
+    );
+}
+
 const eventErrorResponse = ({ status, errorMessage, context }) => ({ status, errorMessage, context })
 
-const actionHandler = {    
+const actionHandler = {
     'GetConversations': async ({ event }) => { },
     'GetMessages': async ({ event }) => { },
     'SendMessage': async ({ event }) => { },
@@ -101,20 +127,20 @@ exports.handler = async (event, context) => {
     if (!!event.eventType) {
         const { eventType } = event;
 
-        const eventHandler = eventHandlers[eventType] || unknownEventTypeError;    
+        const eventHandler = eventHandlers[eventType] || unknownEventTypeError;
 
         return await eventHandler({ event });
     } else {
         const { action } = event.requestContext.body;
 
         const actionHandler = actionHandlers[action];
-    
+
         if (!actionHandler) {
             throw Error(`Unknown action: ${action}`);
         }
-    
+
         await actionHandler({ event });
-    
-        return {};    
+
+        return {};
     }
 };

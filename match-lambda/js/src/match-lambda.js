@@ -4,6 +4,7 @@ const { DateTime } = require('luxon');
 const { log } = require('./util');
 const UsersDataSource = require('./data-source/users');
 const MatchRequestsDataSource = require('./data-source/match-requests');
+const ConversationDataSource = require('./data-source/conversation');
 
 const actionHandlers = {
     'MatchRequest': async ({ event }) => {
@@ -29,13 +30,14 @@ const actionHandlers = {
         log({ foundMatchRequest });
 
         if (foundMatchRequest) {
-            // TODO: create a new conversation
-            return;
-        }
-        const requestDate = DateTime.now().setZone('UTC').toISO();
+            const createConversationResponse = await ConversationDataSource.createConversation({ songId, userUris: [ userUri, foundMatchRequest.UserUri ] })
+            log({ createConversationResponse });            
+        } else {
+            const requestDate = DateTime.now().setZone('UTC').toISO();
 
-        const newMatchRequest = await MatchRequestsDataSource.upsertMatchRequest({ songId, requestDate, userUri });
-        log({ newMatchRequest });
+            const newMatchRequest = await MatchRequestsDataSource.upsertMatchRequest({ songId, requestDate, userUri });
+            log({ newMatchRequest });    
+        }
     }
 }
 

@@ -13,3 +13,11 @@ variable "match_requests_db_table_arn" {
 variable "match_requests_db_table_name" {
     type = string
 }
+
+variable "conversation_lambda_arn" {
+    type = string
+}
+
+variable "conversation_lambda_function_name" {
+    type = string
+}

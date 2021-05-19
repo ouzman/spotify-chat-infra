@@ -56,6 +56,16 @@ data "aws_iam_policy_document" "match_lambda_policy" {
     ]
     effect = "Allow"
   }
+
+  statement {
+    actions = [
+      "lambda:InvokeFunction",
+    ]
+    resources = [
+      var.conversation_lambda_arn,    
+    ]
+    effect = "Allow"
+  }
 }
 
 resource "aws_iam_role_policy" "match_lambda_policy" {
@@ -79,6 +89,7 @@ resource "aws_lambda_function" "match_lambda" {
     variables = {
       USERS_DB_TABLE_NAME = var.users_db_table_name,
       MATCH_REQUESTS_DB_TABLE_NAME = var.match_requests_db_table_name,
+      CONVERSATION_LAMBDA_FUNCTION_NAME = var.conversation_lambda_function_name,
     }
   }
   tags = {
