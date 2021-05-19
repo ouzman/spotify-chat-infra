@@ -24,8 +24,8 @@ exports.upsertMatchRequest = async ({ songId, requestDate, userUri }) => {
 }
 
 exports.popMatchRequest = async ({ songId, prohibitedUserUri, requestDateRangeFromNowInSeconds }) => {
-    var now = DateTime.now().toUTC({});
-    var minValidDate = now.minus({ seconds: requestDateRangeFromNowInSeconds });
+    const now = DateTime.now().setZone('UTC');
+    const minValidDate = now.minus({ seconds: requestDateRangeFromNowInSeconds });
 
     return dynamo.delete({
         TableName: TABLE_NAME,
@@ -39,8 +39,8 @@ exports.popMatchRequest = async ({ songId, prohibitedUserUri, requestDateRangeFr
         },
         ExpressionAttributeValues: {
             ':prohibitedUserUri': prohibitedUserUri,
-            ':minValidDate': minValidDate.toISO({ includeOffset: true }),
-            ':now': now.toISO({ includeOffset: true }),
+            ':minValidDate': minValidDate.toISO(),
+            ':now': now.toISO(),
         },
         ReturnValues: 'ALL_OLD'
     }).promise()
