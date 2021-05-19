@@ -44,7 +44,9 @@ const actionHandlers = {
 exports.handler = async (event, context) => {
     log({ event, context });
 
-    const { action } = event.body;
+    const body = JSON.parse(event.body)
+
+    const { action } = body;
 
     const actionHandler = actionHandlers[action];
 
@@ -52,7 +54,7 @@ exports.handler = async (event, context) => {
         throw Error(`Unknown action: ${action}`);
     }
 
-    await actionHandler({ event });
+    await actionHandler({ event: { ...event, body } });
 
     return {};
 };

@@ -131,16 +131,18 @@ exports.handler = async (event, context) => {
 
         return await eventHandler({ event });
     } else {
-        const { action } = event.body;
-
+        const body = JSON.parse(event.body);
+        
+        const { action } = body;
+    
         const actionHandler = actionHandlers[action];
-
+    
         if (!actionHandler) {
             throw Error(`Unknown action: ${action}`);
         }
-
-        await actionHandler({ event });
-
+    
+        await actionHandler({ event: { ...event, body } });
+    
         return {};
     }
 };
