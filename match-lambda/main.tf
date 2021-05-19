@@ -97,6 +97,7 @@ resource "aws_lambda_function" "match_lambda" {
 
   environment {
     variables = {
+      MATCH_REQUEST_LIFETIME = 30,
       USERS_DB_TABLE_NAME = var.users_db_table_name,
       MATCH_REQUESTS_DB_TABLE_NAME = var.match_requests_db_table_name,
       CONVERSATION_LAMBDA_FUNCTION_NAME = var.conversation_lambda_function_name,

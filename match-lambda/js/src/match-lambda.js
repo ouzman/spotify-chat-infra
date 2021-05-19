@@ -6,6 +6,8 @@ const UsersDataSource = require('./data-source/users');
 const MatchRequestsDataSource = require('./data-source/match-requests');
 const ConversationDataSource = require('./data-source/conversation');
 
+const MATCH_REQUEST_LIFETIME = process.env.MATCH_REQUEST_LIFETIME;
+
 const actionHandlers = {
     'MatchRequest': async ({ event }) => {
         const { requestContext: { authorizer: { principalId: userUri } } } = event;
@@ -26,7 +28,7 @@ const actionHandlers = {
 
         const { id: songId } = user.NowPlaying;
 
-        const foundMatchRequest = await MatchRequestsDataSource.popMatchRequest({ songId, prohibitedUserUri: userUri, requestDateRangeFromNowInSeconds: 10 });
+        const foundMatchRequest = await MatchRequestsDataSource.popMatchRequest({ songId, prohibitedUserUri: userUri, requestDateRangeFromNowInSeconds: MATCH_REQUEST_LIFETIME });
         log({ foundMatchRequest });
 
         if (foundMatchRequest) {
