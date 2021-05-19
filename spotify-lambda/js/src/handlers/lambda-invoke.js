@@ -70,7 +70,7 @@ const eventHandlers = {
                 updatedTokenData,
             }
         }
-    },  
+    },
     'getCurrentlyPlaying': async ({ event }) => {
         const { accessToken, refreshToken } = event.payload;
 
@@ -111,6 +111,50 @@ const eventHandlers = {
             status: 0,
             context: {
                 currentlyPlaying: responseBody,
+                updatedTokenData,
+            }
+        }
+    }, 
+    'getSong': async ({ event }) => {
+        const { songId, accessToken, refreshToken } = event.payload;
+
+        const request = new Request(`${SPOTIFY_BASE_URI}/v1/tracks/${songId}`, {
+            method: 'GET',
+            headers: {
+                authorization: `Bearer ${accessToken}`,
+            }
+        });
+
+        let response;
+        let updatedTokenData;
+        try {
+            ({ response, updatedTokenData } = await fetchWithRefreshTokenRetry({ request, accessToken, refreshToken }));
+        } catch (error) {
+            return networkError({ event, error });
+        }
+
+        if (response.status === 204) {
+            return {
+                status: 0,
+                context: {
+                    currentlyPlaying: null,
+                    updatedTokenData,
+                }
+            }
+        }
+
+        const responseBody = await response.json();
+
+        log({ responseBody });
+
+        if (response.ok === false) {
+            return errorResponse({ event, request, response: responseBody })
+        }
+
+        return {
+            status: 0,
+            context: {
+                song: responseBody,
                 updatedTokenData,
             }
         }

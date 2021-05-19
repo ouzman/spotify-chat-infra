@@ -19,7 +19,7 @@ resource "aws_apigatewayv2_integration" "chat_lambda_integration" {
   passthrough_behavior      = "WHEN_NO_MATCH"
 }
 
-resource "aws_apigatewayv2_integration" "natch_lambda_integration" {
+resource "aws_apigatewayv2_integration" "match_lambda_integration" {
   api_id           = aws_apigatewayv2_api.chat_api.id
   integration_type = "AWS_PROXY"
 
@@ -27,6 +27,17 @@ resource "aws_apigatewayv2_integration" "natch_lambda_integration" {
   content_handling_strategy = "CONVERT_TO_TEXT"
   integration_method        = "POST"
   integration_uri           = var.match_lambda_invoke_arn
+  passthrough_behavior      = "WHEN_NO_MATCH"
+}
+
+resource "aws_apigatewayv2_integration" "conversation_lambda_integration" {
+  api_id           = aws_apigatewayv2_api.chat_api.id
+  integration_type = "AWS_PROXY"
+
+  connection_type           = "INTERNET"
+  content_handling_strategy = "CONVERT_TO_TEXT"
+  integration_method        = "POST"
+  integration_uri           = var.conversation_lambda_invoke_arn
   passthrough_behavior      = "WHEN_NO_MATCH"
 }
 
@@ -43,6 +54,15 @@ resource "aws_lambda_permission" "match_lambda_permission" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = var.match_lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.chat_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "conversation_lambda_permission" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = var.conversation_lambda_function_name
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_apigatewayv2_api.chat_api.execution_arn}/*/*"
@@ -86,11 +106,40 @@ resource "aws_apigatewayv2_route" "default_route" {
   target    = "integrations/${aws_apigatewayv2_integration.chat_lambda_integration.id}"
 }
 
-
 resource "aws_apigatewayv2_route" "match_request_route" {
   api_id    = aws_apigatewayv2_api.chat_api.id
   route_key = "MatchRequest"
-  target    = "integrations/${aws_apigatewayv2_integration.natch_lambda_integration.id}"
+  target    = "integrations/${aws_apigatewayv2_integration.match_lambda_integration.id}"
+}
+
+resource "aws_apigatewayv2_route" "create_conversation_route" {
+  api_id    = aws_apigatewayv2_api.chat_api.id
+  route_key = "CreateConversation"
+  target    = "integrations/${aws_apigatewayv2_integration.conversation_lambda_integration.id}"
+}
+
+resource "aws_apigatewayv2_route" "get_conversations_route" {
+  api_id    = aws_apigatewayv2_api.chat_api.id
+  route_key = "GetConversations"
+  target    = "integrations/${aws_apigatewayv2_integration.conversation_lambda_integration.id}"
+}
+
+resource "aws_apigatewayv2_route" "get_messages_route" {
+  api_id    = aws_apigatewayv2_api.chat_api.id
+  route_key = "GetMessages"
+  target    = "integrations/${aws_apigatewayv2_integration.conversation_lambda_integration.id}"
+}
+
+resource "aws_apigatewayv2_route" "send_message_route" {
+  api_id    = aws_apigatewayv2_api.chat_api.id
+  route_key = "SendMessage"
+  target    = "integrations/${aws_apigatewayv2_integration.conversation_lambda_integration.id}"
+}
+
+resource "aws_apigatewayv2_route" "dismiss_conversations_route" {
+  api_id    = aws_apigatewayv2_api.chat_api.id
+  route_key = "DismissConversation"
+  target    = "integrations/${aws_apigatewayv2_integration.conversation_lambda_integration.id}"
 }
 
 resource "aws_apigatewayv2_deployment" "default_deployment" {
@@ -106,8 +155,16 @@ resource "aws_apigatewayv2_deployment" "default_deployment" {
                 jsonencode(aws_apigatewayv2_route.disconnect_route), 
                 jsonencode(aws_apigatewayv2_route.default_route), 
                 jsonencode(aws_apigatewayv2_route.match_request_route), 
+
+                jsonencode(aws_apigatewayv2_route.create_conversation_route), 
+                jsonencode(aws_apigatewayv2_route.get_conversations_route), 
+                jsonencode(aws_apigatewayv2_route.get_messages_route), 
+                jsonencode(aws_apigatewayv2_route.send_message_route), 
+                jsonencode(aws_apigatewayv2_route.dismiss_conversations_route), 
+
                 var.chat_lambda_invoke_arn,
                 var.match_lambda_invoke_arn,
+                var.conversation_lambda_invoke_arn,
     )))
   }
 
@@ -133,6 +190,36 @@ resource "aws_apigatewayv2_stage" "prod_stage" {
 
   route_settings {
     route_key = "MatchRequest"
+    throttling_burst_limit = 100
+    throttling_rate_limit = 50
+  }
+
+  route_settings {
+    route_key = "CreateConversation"
+    throttling_burst_limit = 100
+    throttling_rate_limit = 50
+  }
+
+  route_settings {
+    route_key = "GetConversations"
+    throttling_burst_limit = 100
+    throttling_rate_limit = 50
+  }
+
+  route_settings {
+    route_key = "GetMessages"
+    throttling_burst_limit = 100
+    throttling_rate_limit = 50
+  }
+
+  route_settings {
+    route_key = "SendMessage"
+    throttling_burst_limit = 100
+    throttling_rate_limit = 50
+  }
+
+  route_settings {
+    route_key = "DismissConversation"
     throttling_burst_limit = 100
     throttling_rate_limit = 50
   }
@@ -168,4 +255,14 @@ resource "aws_iam_policy" "match_lambda_manage_connections_policy" {
 resource "aws_iam_role_policy_attachment" "chat_api_match_lambda_manage_connections_policy_attachment" {
   role       = var.match_lambda_role_name
   policy_arn = aws_iam_policy.match_lambda_manage_connections_policy.arn
+}
+
+resource "aws_iam_policy" "conversation_lambda_manage_connections_policy" {
+  name   = "spotify_chat_conversation_lambda_manage_connections_policy"
+  policy = data.aws_iam_policy_document.manage_connections_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "chat_api_conversation_lambda_manage_connections_policy_attachment" {
+  role       = var.conversation_lambda_role_name
+  policy_arn = aws_iam_policy.conversation_lambda_manage_connections_policy.arn
 }

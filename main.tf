@@ -21,6 +21,7 @@ locals {
   connections_db_table_name      = "spotify-chat-connections"
   connections_db_user_uri_index  = "user-uri-index"
   match_requests_db_table_name   = "spotify-chat-match-requests"
+  conversations_db_table_name    = "spotify-chat-conversations"
 }
 
 module "users_db" {
@@ -91,6 +92,21 @@ module "match_lambda" {
   match_requests_db_table_name  = local.match_requests_db_table_name
 }
 
+module "conversations_db" {
+  source      = "./conversations-db"
+  table_name  = local.conversations_db_table_name
+}
+
+module "conversation_lambda" {
+  source                       = "./conversation-lambda"
+  users_db_table_arn           = module.users_db.users_db_arn
+  users_db_table_name          = local.users_db_table_name
+  conversations_db_table_arn   = module.conversations_db.conversations_db_arn
+  conversations_db_table_name  = local.conversations_db_table_name
+  spotify_lambda_arn           = module.spotify_lambda.spotify_lambda_arn
+  spotify_lambda_function_name = module.spotify_lambda.spotify_lambda_function_name
+}
+
 module "chat_api" {
   source = "./chat-api"
   chat_lambda_invoke_arn                    = module.chat_lambda.chat_lambda_invoke_arn
@@ -100,6 +116,10 @@ module "chat_api" {
   match_lambda_invoke_arn                   = module.match_lambda.match_lambda_invoke_arn
   match_lambda_function_name                = module.match_lambda.match_lambda_function_name
   match_lambda_role_name                    = module.match_lambda.match_lambda_role_name
+
+  conversation_lambda_invoke_arn            = module.conversation_lambda.conversation_lambda_invoke_arn
+  conversation_lambda_function_name         = module.conversation_lambda.conversation_lambda_function_name
+  conversation_lambda_role_name             = module.conversation_lambda.conversation_lambda_role_name
 
   api_key_authorizer_lambda_invoke_arn      = module.api_key_authorizer_lambda.api_key_authorizer_lambda_invoke_arn
   api_key_authorizer_lambda_function_name   = module.api_key_authorizer_lambda.api_key_authorizer_lambda_function_name

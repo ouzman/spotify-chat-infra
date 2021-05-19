@@ -29,3 +29,15 @@ variable "match_lambda_function_name" {
 variable "match_lambda_role_name" {
     type = string
 }
+
+variable "conversation_lambda_invoke_arn" {
+    type = string
+}
+
+variable "conversation_lambda_function_name" {
+    type = string
+}
+
+variable "conversation_lambda_role_name" {
+    type = string
+}
