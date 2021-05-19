@@ -8,7 +8,7 @@ exports.updateUserTokensBySpotifyUri = async ({ spotifyuri, accessToken, refresh
     return dynamo.update({
         TableName: TABLE_NAME,
         Key: { 'SpotifyUri': spotifyuri },
-        UpdateExpression: '#ACCT=:accessToken, #REFT=:refreshToken',
+        UpdateExpression: 'SET #ACCT=:accessToken, #REFT=:refreshToken',
         ExpressionAttributeNames: {
             '#ACCT': 'AccessToken',
             '#REFT': 'RefreshToken'
