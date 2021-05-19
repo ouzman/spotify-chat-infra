@@ -33,3 +33,11 @@ variable "connections_db_table_name" {
 variable "connections_db_user_uri_index" {
     type = string
 }
+
+variable "chat_api_execution_arn" {
+    type = string
+}
+
+variable "chat_api_endpoint" {
+  type = string
+}

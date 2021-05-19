@@ -4,6 +4,8 @@ const { log } = require('./util');
 
 const { findByUseryUri, getByConnectionId, createConnection, deleteByConnectionId } = require('./data-source/connections');
 
+const managementApi = new AWS.ApiGatewayManagementApi({ endpoint: process.env.CHAT_API_ENDPOINT });
+
 const createEchoMessage = ({ event }) => ({
     connectionId: event.requestContext.connectionId,
     type: 'ECHO',
@@ -36,10 +38,6 @@ const routeHandlers = {
     },
     '$default': async ({ event }) => {
         const message = createEchoMessage({ event });
-
-        const managementApi = new AWS.ApiGatewayManagementApi({ 
-            endpoint: `https://${event.requestContext.domainName}/${event.requestContext.stage}`,
-        });
 
         const response = await managementApi.postToConnection({
             ConnectionId: message.connectionId,

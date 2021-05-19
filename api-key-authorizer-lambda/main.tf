@@ -86,3 +86,12 @@ resource "aws_lambda_function" "api_key_authorizer_lambda" {
     project = "spotify-chat"
   }
 }
+
+resource "aws_lambda_permission" "api_key_authorizer_lambda_permission" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.api_key_authorizer_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${var.chat_api_execution_arn}/authorizers/*"
+}

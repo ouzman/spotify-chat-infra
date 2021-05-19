@@ -13,3 +13,7 @@ variable "api_keys_db_table_arn" {
 variable "api_keys_db_table_name" {
     type = string
 }
+
+variable "chat_api_execution_arn" {
+    type = string
+}

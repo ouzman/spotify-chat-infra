@@ -2,6 +2,8 @@ const AWS = require('aws-sdk');
 
 const { log } = require('./util');
 
+const managementApi = new AWS.ApiGatewayManagementApi({ endpoint: process.env.CHAT_API_ENDPOINT });
+
 const UsersDataSource = require('./data-source/users');
 const SpotifyDataSource = require('./data-source/spotify');
 const ConversatiosnDataSource = require('./data-source/conversations');
@@ -40,7 +42,7 @@ const eventHandlers = {
             })
         }
 
-        const { context: { song, updatedTokenData } } = currentlyPlayingResponse;
+        const { context: { song, updatedTokenData } } = songResponse;
 
         if (!!updatedTokenData) {
             log('Token information changed, updating...')
@@ -66,7 +68,7 @@ const eventHandlers = {
             users: usersAttribute,
         });
 
-        sendToClients({ event, userUris, messageContent: { conversation } })
+        sendToClients({ userUris, messageContent: { conversation } })
 
         return {
             status: 0,
@@ -77,15 +79,11 @@ const eventHandlers = {
     },
 }
 
-const sendToClients = async ({ event, userUris, messageContent }) => {
+const sendToClients = async ({ userUris, messageContent }) => {
     const connections = Promise.all(
         userUris
             .map(userUri => ConnectionsDataSource.findByUseryUri({ userUri }))
     );
-
-    const managementApi = new AWS.ApiGatewayManagementApi({
-        endpoint: `https://${event.requestContext.domainName}/${event.requestContext.stage}`,
-    });
 
     await Promise.all(
         connections

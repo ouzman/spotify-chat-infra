@@ -11,7 +11,7 @@ exports.createConversation = async ({ song, users }) => {
     return dynamo.update({
         TableName: TABLE_NAME,
         Key: { 'Id': generateId() },
-        UpdateExpression: '#SONG=:song, #USERS=:users',
+        UpdateExpression: 'SET #SONG=:song, #USERS=:users',
         ExpressionAttributeNames: {
             '#SONG': 'Song',
             '#USERS': 'Users'

@@ -66,6 +66,16 @@ data "aws_iam_policy_document" "match_lambda_policy" {
     ]
     effect = "Allow"
   }
+
+  statement {
+    actions = [
+      "execute-api:ManageConnections",
+    ]
+    resources = [
+      "${var.chat_api_execution_arn}/*",
+    ]
+    effect = "Allow"
+  }
 }
 
 resource "aws_iam_role_policy" "match_lambda_policy" {
@@ -90,9 +100,19 @@ resource "aws_lambda_function" "match_lambda" {
       USERS_DB_TABLE_NAME = var.users_db_table_name,
       MATCH_REQUESTS_DB_TABLE_NAME = var.match_requests_db_table_name,
       CONVERSATION_LAMBDA_FUNCTION_NAME = var.conversation_lambda_function_name,
+      CHAT_API_ENDPOINT = var.chat_api_endpoint
     }
   }
   tags = {
     project = "spotify-chat"
   }
+}
+
+resource "aws_lambda_permission" "match_lambda_permission" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.match_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${var.chat_api_execution_arn}/*/*"
 }

@@ -21,3 +21,11 @@ variable "conversation_lambda_arn" {
 variable "conversation_lambda_function_name" {
     type = string
 }
+
+variable "chat_api_execution_arn" {
+    type = string
+}
+
+variable "chat_api_endpoint" {
+  type = string
+}

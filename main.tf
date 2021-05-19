@@ -22,6 +22,7 @@ locals {
   connections_db_user_uri_index  = "user-uri-index"
   match_requests_db_table_name   = "spotify-chat-match-requests"
   conversations_db_table_name    = "spotify-chat-conversations"
+  chat_api_stage                 = "prod"
 }
 
 module "users_db" {
@@ -64,6 +65,7 @@ module "api_key_authorizer_lambda" {
   users_db_table_name    = local.users_db_table_name
   api_keys_db_table_arn  = module.api_keys_db.api_keys_db_arn
   api_keys_db_table_name = local.api_keys_db_table_name
+  chat_api_execution_arn = module.chat_api_definition.chat_api_execution_arn
 }
 
 module "login_api" {
@@ -72,11 +74,17 @@ module "login_api" {
   registration_lambda_function_name = module.registration_lambda.registration_lambda_function_name
 }
 
+module "chat_api_definition" {
+  source = "./chat-api-definition"
+}
+
 module "chat_lambda" {
-  source              = "./chat-lambda"
+  source                        = "./chat-lambda"
   connections_db_table_arn      = module.connections_db.connections_db_arn
   connections_db_table_name     = local.connections_db_table_name
   connections_db_user_uri_index = local.connections_db_user_uri_index
+  chat_api_execution_arn        = module.chat_api_definition.chat_api_execution_arn
+  chat_api_endpoint             = "https://${module.chat_api_definition.chat_api_id}.execute-api.${var.region}.amazonaws.com/${local.chat_api_stage}"
 }
 
 module "conversations_db" {
@@ -95,6 +103,8 @@ module "conversation_lambda" {
   connections_db_table_arn      = module.connections_db.connections_db_arn
   connections_db_table_name     = local.connections_db_table_name
   connections_db_user_uri_index = local.connections_db_user_uri_index
+  chat_api_execution_arn        = module.chat_api_definition.chat_api_execution_arn
+  chat_api_endpoint             = "https://${module.chat_api_definition.chat_api_id}.execute-api.${var.region}.amazonaws.com/${local.chat_api_stage}"
 }
 
 module "match_requests_db" {
@@ -110,24 +120,22 @@ module "match_lambda" {
   match_requests_db_table_name      = local.match_requests_db_table_name
   conversation_lambda_arn           = module.conversation_lambda.conversation_lambda_arn
   conversation_lambda_function_name = module.conversation_lambda.conversation_lambda_function_name
+  chat_api_execution_arn            = module.chat_api_definition.chat_api_execution_arn
+  chat_api_endpoint                 = "https://${module.chat_api_definition.chat_api_id}.execute-api.${var.region}.amazonaws.com/${local.chat_api_stage}"
 }
 
-module "chat_api" {
-  source = "./chat-api"
+module "chat_api_configuration" {
+  source = "./chat-api-configuration"
+  chat_api_id                               = module.chat_api_definition.chat_api_id
+  chat_api_hash                             = module.chat_api_definition.chat_api_hash
+  chat_api_stage                            = local.chat_api_stage
+
   chat_lambda_invoke_arn                    = module.chat_lambda.chat_lambda_invoke_arn
-  chat_lambda_function_name                 = module.chat_lambda.chat_lambda_function_name
-  chat_lambda_role_name                     = module.chat_lambda.chat_lambda_role_name
-
   match_lambda_invoke_arn                   = module.match_lambda.match_lambda_invoke_arn
-  match_lambda_function_name                = module.match_lambda.match_lambda_function_name
-  match_lambda_role_name                    = module.match_lambda.match_lambda_role_name
-
   conversation_lambda_invoke_arn            = module.conversation_lambda.conversation_lambda_invoke_arn
-  conversation_lambda_function_name         = module.conversation_lambda.conversation_lambda_function_name
-  conversation_lambda_role_name             = module.conversation_lambda.conversation_lambda_role_name
-
   api_key_authorizer_lambda_invoke_arn      = module.api_key_authorizer_lambda.api_key_authorizer_lambda_invoke_arn
-  api_key_authorizer_lambda_function_name   = module.api_key_authorizer_lambda.api_key_authorizer_lambda_function_name
+  
+  depends_on = [ module.chat_api_definition ]
 }
 
 module "update_currently_playing_source" {
