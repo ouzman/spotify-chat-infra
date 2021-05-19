@@ -32,7 +32,11 @@ exports.popMatchRequest = async ({ songId, prohibitedUserUri, requestDateRangeFr
         Key: {
             'SongId': songId,
         },
-        ConditionalExpression: 'UserUri <> :prohibitedUserUri AND RequestDate > :minValidDate AND RequestDate < :now',
+        ConditionExpression: '#USER <> :prohibitedUserUri AND #REQT > :minValidDate AND #REQT < :now',
+        ExpressionAttributeNames: {
+            '#REQT': 'RequestDate',
+            '#USER': 'UserUri',
+        },
         ExpressionAttributeValues: {
             ':prohibitedUserUri': prohibitedUserUri,
             ':minValidDate': minValidDate.toISO({ includeOffset: false }),

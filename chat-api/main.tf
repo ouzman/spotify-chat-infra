@@ -125,6 +125,17 @@ resource "aws_apigatewayv2_stage" "prod_stage" {
   name          = "prod"
   deployment_id = aws_apigatewayv2_deployment.default_deployment.id
   auto_deploy   = false
+
+  default_route_settings {
+    throttling_burst_limit = 0
+    throttling_rate_limit = 0
+  }
+
+  route_settings {
+    route_key = "MatchRequest"
+    throttling_burst_limit = 0
+    throttling_rate_limit = 0
+  }
 }
 
 data "aws_iam_policy_document" "manage_connections_policy" {
