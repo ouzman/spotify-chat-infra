@@ -125,6 +125,13 @@ resource "aws_apigatewayv2_stage" "prod_stage" {
   name          = "prod"
   deployment_id = aws_apigatewayv2_deployment.default_deployment.id
   auto_deploy   = false
+  default_route_settings {
+    logging_level = "ERROR"
+  }
+  route_settings {
+    route_key     = aws_apigatewayv2_route.match_request_route.route_key
+    logging_level = "ERROR"
+  }
 }
 
 data "aws_iam_policy_document" "manage_connections_policy" {
