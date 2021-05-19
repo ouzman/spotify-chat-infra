@@ -131,7 +131,7 @@ exports.handler = async (event, context) => {
 
         return await eventHandler({ event });
     } else {
-        const { action } = event.requestContext.body;
+        const { action } = event.body;
 
         const actionHandler = actionHandlers[action];
 

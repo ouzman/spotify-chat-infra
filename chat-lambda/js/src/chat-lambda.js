@@ -12,7 +12,7 @@ const createEchoMessage = ({ event }) => ({
     }
 })
 
-const actionHandlers = {
+const routeHandlers = {
     '$connect': async ({ event }) => {
         const { connectionId, authorizer: { principalId: userUri } } = event.requestContext;
 
@@ -53,15 +53,15 @@ const actionHandlers = {
 exports.handler = async (event, context) => {
     log({ event, context });
 
-    const { action } = event.requestContext.body;
+    const { routeKey } = event.requestContext;
 
-    const actionHandler = actionHandlers[action];
+    const routeHandler = routeHandlers[routeKey];
 
-    if (!actionHandler) {
-        throw Error(`Unknown action: ${action}`);
+    if (!routeHandler) {
+        throw Error(`Unknown route: ${routeKey}`);
     }
 
-    await actionHandler({ event });
+    await routeHandler({ event });
 
     return {};
 };

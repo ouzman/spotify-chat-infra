@@ -44,7 +44,7 @@ const actionHandlers = {
 exports.handler = async (event, context) => {
     log({ event, context });
 
-    const { action } = event.requestContext.body;
+    const { action } = event.body;
 
     const actionHandler = actionHandlers[action];
 
