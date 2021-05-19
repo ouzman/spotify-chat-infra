@@ -39,6 +39,15 @@ resource "aws_lambda_permission" "chat_lambda_permission" {
   source_arn = "${aws_apigatewayv2_api.chat_api.execution_arn}/*/*"
 }
 
+resource "aws_lambda_permission" "match_lambda_permission" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = var.match_lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.chat_api.execution_arn}/*/*"
+}
+
 resource "aws_apigatewayv2_authorizer" "chat_api_authorizer" {
   api_id           = aws_apigatewayv2_api.chat_api.id
   authorizer_type  = "REQUEST"
@@ -111,9 +120,9 @@ resource "aws_apigatewayv2_deployment" "default_deployment" {
   ]
 }
 
-resource "aws_apigatewayv2_stage" "default_stage" {
+resource "aws_apigatewayv2_stage" "prod_stage" {
   api_id        = aws_apigatewayv2_api.chat_api.id
-  name          = "$default"
+  name          = "prod"
   deployment_id = aws_apigatewayv2_deployment.default_deployment.id
   auto_deploy   = false
 }
