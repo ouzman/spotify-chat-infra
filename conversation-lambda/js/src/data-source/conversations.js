@@ -11,28 +11,54 @@ exports.createConversation = async ({ song, users }) => {
     return dynamo.update({
         TableName: TABLE_NAME,
         Key: { 'Id': generateId() },
-        UpdateExpression: 'SET #SONG=:song, #USERS=:users, #DATE=:date',
+        UpdateExpression: 'SET #SONG=:song, #USERS=:users, #DATE=:date, #MSGS=:messages',
         ExpressionAttributeNames: {
             '#SONG': 'Song',
             '#USERS': 'Users',
-            '#DATE': 'Date'
+            '#DATE': 'Date',
+            '#MSGS': 'Messages',
         },
         ExpressionAttributeValues: {
             ':song': song,
             ':users': users,
             ':date': new Date().toISOString(),
+            ':messages': [],
         },
         ReturnValues: 'ALL_NEW'
     }).promise()
         .then(res => res.Attributes);
 }
 
-exports.getBySpotifyUri = async ({ spotifyUri }) => {
+exports.getById = async ({ conversationId }) => {
     return dynamo.get({
         TableName: TABLE_NAME,
         Key: {
-            'SpotifyUri': spotifyUri
+            'Id': conversationId
         }
     }).promise()
         .then(res => res.Item);
+}
+
+exports.addNewMessage = async ({ conversationId, actorId, messageId, messageContent }) => {
+    const message = {
+        id: messageId,
+        actorId,
+        content: messageContent,
+        date: new Date().toISOString(),
+    };
+
+    await dynamo.update({
+        TableName: TABLE_NAME,
+        Key: { 'Id': generateId() },
+        UpdateExpression: 'SET #MSGS=list_append(#MSGS, :newMessages)',
+        ExpressionAttributeNames: {
+            '#MSGS': 'Messages',
+        },
+        ExpressionAttributeValues: {
+            ':messages': [message],
+        },
+        ReturnValues: 'ALL_NEW'
+    }).promise();
+    
+    return message;
 }

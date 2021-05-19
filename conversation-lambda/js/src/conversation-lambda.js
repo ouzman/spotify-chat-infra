@@ -99,8 +99,41 @@ const sendToClients = async ({ userUris, messageContent }) => {
 const eventSuccessResponse = ({ action, data }) => ({ eventId: generateId(), date: new Date().toISOString(), action, data });
 const eventErrorResponse = ({ status, errorMessage, context }) => ({ status, errorMessage, context })
 
-const actionHandler = {
-    'GetConversations': async ({ event }) => { },
+const actionHandlers = {
+    'GetConversations': async ({ event }) => {
+        const { requestContext: { authorizer: { principalId: userUri } }, body: { conversation, message } } = event;
+        log({ userUri, conversation, message });
+
+        const user = await UsersDataSource.getBySpotifyUri({ spotifyUri: userUri });
+        log({ user });
+
+        if (!user) {
+            log({ message: 'User cannot be found', userUri })
+            return
+        }
+
+        const conversation = await ConversatiosnDataSource.getById({ connectionId });
+        log({ conversation });
+
+        if (!conversation) {
+            log({ message: 'Conversation cannot be found', conversation })
+            return
+        }
+
+        const userBelongsToConversation = conversation.Users.map(user => user.id).includes(userUri);
+        if (!userBelongsToConversation) {
+            log({ message: 'User doesn\'t belong to the conversation', userUri, conversation });
+            return
+        }
+
+        const { id: messageId, content: messageContent } = message;
+
+        const persistedMessage = await ConversatiosnDataSource.addNewMessage({ conversationId, actorId: userUri, messageId, messageContent });
+
+        const userUris = conversation.Users.map(u => u.id);
+
+        await sendToClients({ userUris, messageContent: eventSuccessResponse({ action: 'NewMessage', data: { conversationId, message: persistedMessage } }) })
+    },
     'GetMessages': async ({ event }) => { },
     'SendMessage': async ({ event }) => { },
     'DismissConversation': async ({ event }) => { },

@@ -17,7 +17,7 @@ const actionHandlers = {
         log({ user });
 
         if (!user) {
-            console.log(`User cannot found. UserUri: ${userUri}`)
+            console.log(`User cannot be found. UserUri: ${userUri}`)
             return
         }
 
