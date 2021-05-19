@@ -83,7 +83,7 @@ resource "aws_lambda_function" "registration_lambda" {
   filename      = "${path.module}/js/dist/registration-lambda.zip"
   source_code_hash = data.archive_file.registration_lambda_archive.output_base64sha256
 
-  runtime = "nodejs12.x"
+  runtime = "nodejs14.x"
 
   environment {
     variables = {

@@ -74,7 +74,7 @@ resource "aws_lambda_function" "api_key_authorizer_lambda" {
   filename      = "${path.module}/js/dist/api-key-authorizer-lambda.zip"
   source_code_hash = data.archive_file.api_key_authorizer_lambda_archive.output_base64sha256
 
-  runtime = "nodejs12.x"
+  runtime = "nodejs14.x"
 
   environment {
     variables = {

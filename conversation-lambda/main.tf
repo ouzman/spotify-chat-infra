@@ -85,7 +85,7 @@ resource "aws_lambda_function" "conversation_lambda" {
   filename      = "${path.module}/js/dist/conversation-lambda.zip"
   source_code_hash = data.archive_file.conversation_lambda_archive.output_base64sha256
 
-  runtime = "nodejs12.x"
+  runtime = "nodejs14.x"
 
   environment {
     variables = {

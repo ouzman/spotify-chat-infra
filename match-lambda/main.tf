@@ -83,7 +83,7 @@ resource "aws_lambda_function" "match_lambda" {
   filename      = "${path.module}/js/dist/match-lambda.zip"
   source_code_hash = data.archive_file.match_lambda_archive.output_base64sha256
 
-  runtime = "nodejs12.x"
+  runtime = "nodejs14.x"
 
   environment {
     variables = {

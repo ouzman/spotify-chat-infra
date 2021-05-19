@@ -2,11 +2,11 @@ const AWS = require('aws-sdk');
 
 const lambda = new AWS.Lambda();
 
-const FUNCTION_NAME = process.env.SPOTIFY_LAMBDA_FUNCTION_NAME;
+const FUNCTION_NAME = process.env.CONVERSATION_LAMBDA_FUNCTION_NAME;
 
 exports.createConversation = async ({ songId, userUris }) => {
     const payload = {
-        eventType: 'createConversation',
+        eventType: 'CreateConversation',
         payload: {
             songId,
             userUris,

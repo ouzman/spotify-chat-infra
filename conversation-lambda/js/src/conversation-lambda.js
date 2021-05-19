@@ -15,6 +15,7 @@ const eventHandlers = {
             userUris
                 .map(userUri => UsersDataSource.getBySpotifyUri({ spotifyUri: userUri }))
         );
+        log({ users });
 
         const apiUser = users[0];
 
@@ -65,7 +66,6 @@ const eventHandlers = {
             users: usersAttribute,
         });
 
-        const userUris = users.map(u => u.SpotifyUri);
         sendToClients({ event, userUris, messageContent: { conversation } })
 
         return {
