@@ -5,7 +5,7 @@ const { log } = require('./util');
 const UsersDataSource = require('./data-source/users');
 const MatchRequestsDataSource = require('./data-source/match-requests');
 
-const routeHandlers = {
+const actionHandlers = {
     'MatchRequest': async ({ event }) => {
         const { requestContext: { authorizer: { principalId: userUri } } } = event;
         log({ userUri });
@@ -42,15 +42,15 @@ const routeHandlers = {
 exports.handler = async (event, context) => {
     log({ event, context });
 
-    const { routeKey } = event.requestContext;
+    const { action } = event.requestContext.body;
 
-    const routeHandler = routeHandlers[routeKey];
+    const actionHandler = actionHandlers[action];
 
-    if (!routeHandler) {
-        throw Error(`Unknown route: ${routeKey}`);
+    if (!actionHandler) {
+        throw Error(`Unknown action: ${action}`);
     }
 
-    await routeHandler({ event });
+    await actionHandler({ event });
 
     return {};
 };

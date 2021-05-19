@@ -1,7 +1,7 @@
 resource "aws_apigatewayv2_api" "chat_api" {
   name                          = "spotify-chat-chat-api"
   protocol_type                 = "WEBSOCKET"
-  route_selection_expression    = "$request.body.action"
+  route_selection_expression    = "$request.body.service"
 
   tags = {
     project = "spotify-chat"
@@ -106,39 +106,15 @@ resource "aws_apigatewayv2_route" "default_route" {
   target    = "integrations/${aws_apigatewayv2_integration.chat_lambda_integration.id}"
 }
 
-resource "aws_apigatewayv2_route" "match_request_route" {
+resource "aws_apigatewayv2_route" "match_route" {
   api_id    = aws_apigatewayv2_api.chat_api.id
-  route_key = "MatchRequest"
+  route_key = "Match"
   target    = "integrations/${aws_apigatewayv2_integration.match_lambda_integration.id}"
 }
 
-resource "aws_apigatewayv2_route" "create_conversation_route" {
+resource "aws_apigatewayv2_route" "conversation_route" {
   api_id    = aws_apigatewayv2_api.chat_api.id
-  route_key = "CreateConversation"
-  target    = "integrations/${aws_apigatewayv2_integration.conversation_lambda_integration.id}"
-}
-
-resource "aws_apigatewayv2_route" "get_conversations_route" {
-  api_id    = aws_apigatewayv2_api.chat_api.id
-  route_key = "GetConversations"
-  target    = "integrations/${aws_apigatewayv2_integration.conversation_lambda_integration.id}"
-}
-
-resource "aws_apigatewayv2_route" "get_messages_route" {
-  api_id    = aws_apigatewayv2_api.chat_api.id
-  route_key = "GetMessages"
-  target    = "integrations/${aws_apigatewayv2_integration.conversation_lambda_integration.id}"
-}
-
-resource "aws_apigatewayv2_route" "send_message_route" {
-  api_id    = aws_apigatewayv2_api.chat_api.id
-  route_key = "SendMessage"
-  target    = "integrations/${aws_apigatewayv2_integration.conversation_lambda_integration.id}"
-}
-
-resource "aws_apigatewayv2_route" "dismiss_conversations_route" {
-  api_id    = aws_apigatewayv2_api.chat_api.id
-  route_key = "DismissConversation"
+  route_key = "Conversation"
   target    = "integrations/${aws_apigatewayv2_integration.conversation_lambda_integration.id}"
 }
 
@@ -150,18 +126,12 @@ resource "aws_apigatewayv2_deployment" "default_deployment" {
     redeployment = sha1(
         join(",", 
             list(
-                jsonencode(aws_apigatewayv2_api.chat_api), 
+                jsonencode(aws_apigatewayv2_api.chat_api),                 
                 jsonencode(aws_apigatewayv2_route.connect_route), 
                 jsonencode(aws_apigatewayv2_route.disconnect_route), 
                 jsonencode(aws_apigatewayv2_route.default_route), 
-                jsonencode(aws_apigatewayv2_route.match_request_route), 
-
-                jsonencode(aws_apigatewayv2_route.create_conversation_route), 
-                jsonencode(aws_apigatewayv2_route.get_conversations_route), 
-                jsonencode(aws_apigatewayv2_route.get_messages_route), 
-                jsonencode(aws_apigatewayv2_route.send_message_route), 
-                jsonencode(aws_apigatewayv2_route.dismiss_conversations_route), 
-
+                jsonencode(aws_apigatewayv2_route.match_route), 
+                jsonencode(aws_apigatewayv2_route.conversation_route), 
                 var.chat_lambda_invoke_arn,
                 var.match_lambda_invoke_arn,
                 var.conversation_lambda_invoke_arn,
@@ -189,37 +159,13 @@ resource "aws_apigatewayv2_stage" "prod_stage" {
   }
 
   route_settings {
-    route_key = "MatchRequest"
+    route_key = "Match"
     throttling_burst_limit = 100
     throttling_rate_limit = 50
   }
 
   route_settings {
-    route_key = "CreateConversation"
-    throttling_burst_limit = 100
-    throttling_rate_limit = 50
-  }
-
-  route_settings {
-    route_key = "GetConversations"
-    throttling_burst_limit = 100
-    throttling_rate_limit = 50
-  }
-
-  route_settings {
-    route_key = "GetMessages"
-    throttling_burst_limit = 100
-    throttling_rate_limit = 50
-  }
-
-  route_settings {
-    route_key = "SendMessage"
-    throttling_burst_limit = 100
-    throttling_rate_limit = 50
-  }
-
-  route_settings {
-    route_key = "DismissConversation"
+    route_key = "Conversation"
     throttling_burst_limit = 100
     throttling_rate_limit = 50
   }

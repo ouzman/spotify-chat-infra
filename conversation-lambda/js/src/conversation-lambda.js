@@ -75,7 +75,7 @@ const eventHandlers = {
 
 const eventErrorResponse = ({ status, errorMessage, context }) => ({ status, errorMessage, context })
 
-const routeHandlers = {    
+const actionHandler = {    
     'GetConversations': async ({ event }) => { },
     'GetMessages': async ({ event }) => { },
     'SendMessage': async ({ event }) => { },
@@ -105,15 +105,15 @@ exports.handler = async (event, context) => {
 
         return await eventHandler({ event });
     } else {
-        const { routeKey } = event.requestContext;
+        const { action } = event.requestContext.body;
 
-        const routeHandler = routeHandlers[routeKey];
+        const actionHandler = actionHandlers[action];
     
-        if (!routeHandler) {
-            throw Error(`Unknown route: ${routeKey}`);
+        if (!actionHandler) {
+            throw Error(`Unknown action: ${action}`);
         }
     
-        await routeHandler({ event });
+        await actionHandler({ event });
     
         return {};    
     }
