@@ -127,14 +127,14 @@ resource "aws_apigatewayv2_stage" "prod_stage" {
   auto_deploy   = false
 
   default_route_settings {
-    throttling_burst_limit = 0
-    throttling_rate_limit = 0
+    throttling_burst_limit = 100
+    throttling_rate_limit = 50
   }
 
   route_settings {
     route_key = "MatchRequest"
-    throttling_burst_limit = 0
-    throttling_rate_limit = 0
+    throttling_burst_limit = 100
+    throttling_rate_limit = 50
   }
 }
 
