@@ -100,7 +100,9 @@ const eventSuccessResponse = ({ action, data }) => ({ eventId: generateId(), dat
 const eventErrorResponse = ({ status, errorMessage, context }) => ({ status, errorMessage, context })
 
 const actionHandlers = {
-    'GetConversations': async ({ event }) => {
+    'GetConversations': async ({ event }) => { },
+    'GetMessages': async ({ event }) => { },
+    'SendMessage': async ({ event }) => {
         const { requestContext: { authorizer: { principalId: userUri } }, body: { conversation, message } } = event;
         log({ userUri, conversation, message });
 
@@ -132,10 +134,8 @@ const actionHandlers = {
 
         const userUris = conversation.Users.map(u => u.id);
 
-        await sendToClients({ userUris, messageContent: eventSuccessResponse({ action: 'NewMessage', data: { conversationId, message: persistedMessage } }) })
+        await sendToClients({ userUris, messageContent: eventSuccessResponse({ action: 'NewMessage', data: { conversationId, message: persistedMessage } }) });
     },
-    'GetMessages': async ({ event }) => { },
-    'SendMessage': async ({ event }) => { },
     'DismissConversation': async ({ event }) => { },
 }
 
