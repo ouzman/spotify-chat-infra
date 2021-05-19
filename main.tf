@@ -20,7 +20,7 @@ locals {
   api_keys_db_user_uri_index     = "user-uri-index"
   connections_db_table_name      = "spotify-chat-connections"
   connections_db_user_uri_index  = "user-uri-index"
-  match_requests_db_table_name   = "spotify-chat-matches"
+  match_requests_db_table_name   = "spotify-chat-match-requests"
 }
 
 module "users_db" {
