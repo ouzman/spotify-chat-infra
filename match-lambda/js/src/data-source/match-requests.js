@@ -3,7 +3,7 @@ const { DateTime } = require('luxon');
 
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
-const TABLE_NAME = process.env.MATCH_REQUESTS_TABLE_NAME
+const TABLE_NAME = process.env.MATCH_REQUESTS_DB_TABLE_NAME
 
 exports.upsertMatchRequest = async ({ songId, requestDate, userUri }) => {
     return dynamo.update({
