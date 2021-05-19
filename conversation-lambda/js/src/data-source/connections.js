@@ -18,5 +18,6 @@ exports.findByUseryUri = async ({ userUri }) => {
         KeyConditionExpression: 'UserUri = :uri',
         ExpressionAttributeValues: { ':uri': userUri }
     }).promise()
+        .then(debug => { console.log({ debug, attr: debug.Items }); return debug; })
         .then(res => res.Items);
 }

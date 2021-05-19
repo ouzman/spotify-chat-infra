@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 
 const { log } = require('./util');
+const { generateId } = require('./generators');
 
 const managementApi = new AWS.ApiGatewayManagementApi({ endpoint: process.env.CHAT_API_ENDPOINT });
 
@@ -13,13 +14,13 @@ const eventHandlers = {
     'CreateConversation': async ({ event }) => {
         const { songId, userUris } = event.payload;
 
-        const users = await Promise.all(
+        const Users = await Promise.all(
             userUris
                 .map(userUri => UsersDataSource.getBySpotifyUri({ spotifyUri: userUri }))
         );
-        log({ users });
+        log({ Users });
 
-        const apiUser = users[0];
+        const apiUser = Users[0];
 
         const { AccessToken: accessToken, RefreshToken: refreshToken } = apiUser;
 
@@ -42,61 +43,60 @@ const eventHandlers = {
             })
         }
 
-        const { context: { song, updatedTokenData } } = songResponse;
+        const { context: { song: spotifySong, updatedTokenData } } = songResponse;
 
         if (!!updatedTokenData) {
             log('Token information changed, updating...')
             await UsersDataSource.updateUserTokensBySpotifyUri({ spotifyUri: apiUser.userUri, accessToken: updatedTokenData['access_token'], refreshToken: updatedTokenData['refresh_token'] });
         }
 
-        const songAttribute = songModel({
-            id: song.id,
-            name: song.name ?? 'Unknown Song',
-            artist: song.artists?.map(artist => artist.name)?.join(', ') ?? 'Unknown Artist',
-            image: song.album?.images?.[0]?.url ?? '',
-        });
+        const song = songModel({ spotifySong });
 
-        const usersAttribute = users
-            .map(user => userModel({
-                id: user.SpotifyUri,
-                name: user.DisplayName,
-                profilePhotoUrl: user.ImageUrl,
-            }))
+        const users = Users
+            .map(User => userModel({ User }))
 
-        const conversation = await ConversatiosnDataSource.createConversation({
-            song: songAttribute,
-            users: usersAttribute,
-        });
+        const Conversation = await ConversatiosnDataSource.createConversation({ song, users });
+        log({ Conversation })
 
-        sendToClients({ userUris, messageContent: { conversation } })
+        await sendToClients({ userUris, messageContent: eventSuccessResponse({ action: 'NewConversation', data: { conversation: conversationModel({ Conversation }) } }) })
 
         return {
             status: 0,
             context: {
-                conversation
+                conversation: Conversation
             }
         }
     },
 }
 
 const sendToClients = async ({ userUris, messageContent }) => {
-    const connections = Promise.all(
-        userUris
-            .map(userUri => ConnectionsDataSource.findByUseryUri({ userUri }))
+    const connectionsOfUsers = await Promise.all(
+        userUris.map((userUri) => ConnectionsDataSource.findByUseryUri({ userUri }))
     );
+    log({ connectionsOfUsers });
+
+    const connectionIds = connectionsOfUsers
+        .flatMap(userConnections => userConnections)
+        .map(connection => connection.ConnectionId);
+    log({ connectionIds });
 
     await Promise.all(
-        connections
-        .map(connection => connection.ConnectionId)
-        .map(connectionId =>
-            managementApi.postToConnection({
-                ConnectionId: connectionId,
-                Data: JSON.stringify(messageContent),
-            }).promise()
-        )
+        connectionIds
+            .map(connectionId => {
+                log({ connectionId })
+
+                const payload = {
+                    ConnectionId: connectionId,
+                    Data: JSON.stringify(messageContent),
+                };
+                log({ payload });
+
+                return managementApi.postToConnection(payload).promise();
+            })
     );
 }
 
+const eventSuccessResponse = ({ action, data }) => ({ eventId: generateId(), date: new Date().toISOString(), action, data });
 const eventErrorResponse = ({ status, errorMessage, context }) => ({ status, errorMessage, context })
 
 const actionHandler = {
@@ -106,10 +106,28 @@ const actionHandler = {
     'DismissConversation': async ({ event }) => { },
 }
 
-const songModel = ({ id, name, artist, image }) => ({ id, name, artist, image });
-const userModel = ({ id, name, profilePhotoUrl }) => ({ id, name, profilePhotoUrl });
+const songModel = ({ spotifySong }) => ({
+    id: spotifySong.id,
+    name: spotifySong.name ?? 'Unknown Song',
+    artist: spotifySong.artists?.map(artist => artist.name)?.join(', ') ?? 'Unknown Artist',
+    image: spotifySong.album?.images?.[0]?.url ?? '',
+});
+
+const userModel = ({ User }) => ({
+    id: User.SpotifyUri,
+    name: User.DisplayName,
+    profilePhotoUrl: User.ImageUrl,
+});
+
+const conversationModel = ({ Conversation }) => ({
+    id: Conversation.Id,
+    song: Conversation.Song,
+    users: Conversation.Users,
+    date: Conversation.Date,
+    lastMessage: null, // TODO
+});
+
 const messageModel = ({ id, actorId, content, date }) => ({ id, actorId, content, date });
-const conversationModel = ({ id, lastMessage, song, users }) => ({ id, lastMessage, song, users });
 
 
 function unknownEventTypeError({ event }) {
@@ -130,17 +148,17 @@ exports.handler = async (event, context) => {
         return await eventHandler({ event });
     } else {
         const body = JSON.parse(event.body);
-        
+
         const { action } = body;
-    
+
         const actionHandler = actionHandlers[action];
-    
+
         if (!actionHandler) {
             throw Error(`Unknown action: ${action}`);
         }
-    
+
         await actionHandler({ event: { ...event, body } });
-    
+
         return {};
     }
 };

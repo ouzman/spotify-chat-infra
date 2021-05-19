@@ -19,11 +19,20 @@ const routeHandlers = {
         const { connectionId, authorizer: { principalId: userUri } } = event.requestContext;
 
         const connections = await findByUseryUri({ userUri });
+        log({ message: 'Stale connections found', connections });
+        
+        for (const connection of connections) {
+            try {
+                await deleteByConnectionId({ connectionId: connection.ConnectionId });
+                log({ message: 'Connection removed from database', connection });
 
-        connections.forEach(connection => {
-            // TODO: close connections
+                await managementApi.deleteConnection({ ConnectionId: message.connectionId }).promise();    
+                log({ message: 'Connection closed on API GW', connection });
+            } catch (error) {
+                log({ error });
+            }    
             // TODO: dismiss active conversations
-        });
+        }
 
         await createConnection({ connectionId, userUri });
      },
