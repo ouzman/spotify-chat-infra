@@ -49,7 +49,7 @@ exports.addNewMessage = async ({ conversationId, actorId, messageId, messageCont
 
     await dynamo.update({
         TableName: TABLE_NAME,
-        Key: { 'Id': generateId() },
+        Key: { 'Id': conversationId },
         UpdateExpression: 'SET #MSGS=list_append(if_not_exists(#MSGS, :empty_list), :newMessages)',
         ExpressionAttributeNames: {
             '#MSGS': 'Messages',
@@ -63,3 +63,19 @@ exports.addNewMessage = async ({ conversationId, actorId, messageId, messageCont
     
     return message;
 }
+
+exports.findByUseryUri = async ({ userUri }) => {
+    return dynamo.get({
+        TableName: TABLE_NAME,
+        FilterExpression : 'contains(#USERS = :userUri)',
+        ExpressionAttributeNames: {
+            '#USERS': 'Users',
+        },
+        ExpressionAttributeValues: {
+            ':userUri': userUri,
+        },
+    }).promise()
+        .then(res => res.Items);
+}
+
+ 

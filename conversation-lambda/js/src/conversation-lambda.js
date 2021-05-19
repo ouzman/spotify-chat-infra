@@ -100,11 +100,20 @@ const eventSuccessResponse = ({ action, data }) => ({ eventId: generateId(), dat
 const eventErrorResponse = ({ status, errorMessage, context }) => ({ status, errorMessage, context })
 
 const actionHandlers = {
-    'GetConversations': async ({ event }) => { },
+    'GetConversations': async ({ event }) => {
+        const { requestContext: { authorizer: { principalId: userUri } } } = event;
+
+        const Conversations = await ConversationDataSource.findByUseryUri({ userUri });
+        log({ Conversations });
+        
+        let conversations = Conversations.map(Conversation => conversationModel({ Conversation }));
+        log({ conversations });
+
+        await sendToClients({ userUris: [userUri], messageContent: eventSuccessResponse({ action: 'Conversations', data: { conversations } }) });
+    },
     'GetMessages': async ({ event }) => { },
     'SendMessage': async ({ event }) => {
         const { requestContext: { authorizer: { principalId: userUri } }, body: { data: { conversation: conversationId, message } } } = event;
-        log({ event });
         log({ userUri, conversationId, message });
 
         const user = await UsersDataSource.getBySpotifyUri({ spotifyUri: userUri });
@@ -158,7 +167,7 @@ const conversationModel = ({ Conversation }) => ({
     song: Conversation.Song,
     users: Conversation.Users,
     date: Conversation.Date,
-    lastMessage: null, // TODO
+    lastMessage: Conversation.Messages.reduce((acc, message) => acc > new Date(message.date) ? acc : message, new Date(0)),
 });
 
 const messageModel = ({ id, actorId, content, date }) => ({ id, actorId, content, date });
