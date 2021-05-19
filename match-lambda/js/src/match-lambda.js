@@ -7,8 +7,10 @@ const MatchRequestsDataSource = require('./data-source/match-requests');
 const routeHandlers = {
     'MatchRequest': async ({ event }) => {
         const { requestContext: { authorizer: { principalId: userUri } } } = event;
+        log({ userUri });
         
         const user = await UsersDataSource.getBySpotifyUri({ spotifyUri: userUri });
+        log({ user });
 
         if (!user) {
             console.log(`User cannot found. UserUri: ${userUri}`)

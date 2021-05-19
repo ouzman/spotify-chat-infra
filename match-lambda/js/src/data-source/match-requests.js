@@ -24,25 +24,32 @@ exports.upsertMatchRequest = async ({ songId, requestDate, userUri }) => {
 }
 
 exports.popMatchRequest = async ({ songId, prohibitedUserUri, requestDateRangeFromNowInSeconds }) => {
-    const now = DateTime.now();
-    const minValidDate = now.minus({ seconds: requestDateRangeFromNowInSeconds });
+    var now = DateTime.now().toUTC({});
+    var minValidDate = now.minus({ seconds: requestDateRangeFromNowInSeconds });
 
     return dynamo.delete({
         TableName: TABLE_NAME,
         Key: {
             'SongId': songId,
         },
-        ConditionExpression: '#USER <> :prohibitedUserUri AND #REQT > :minValidDate AND #REQT < :now',
+        ConditionExpression: 'UserUri <> :prohibitedUserUri AND RequestDate BETWEEN :minValidDate AND :now',
         ExpressionAttributeNames: {
             '#REQT': 'RequestDate',
             '#USER': 'UserUri',
         },
         ExpressionAttributeValues: {
             ':prohibitedUserUri': prohibitedUserUri,
-            ':minValidDate': minValidDate.toISO({ includeOffset: false }),
-            ':now': now.toISO({ includeOffset: false }),
+            ':minValidDate': minValidDate.toISO({ includeOffset: true }),
+            ':now': now.toISO({ includeOffset: true }),
         },
         ReturnValues: 'ALL_OLD'
     }).promise()
-        .then(res => res.Attributes);;
+        .then(res => res.Attributes)
+        .catch(e => {
+            if (e.code === 'ConditionalCheckFailedException') {
+                return { };
+            } else {
+                throw e;
+            }
+        });
 }
