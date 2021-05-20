@@ -29,7 +29,11 @@ const routeHandlers = {
         return spotifyAuthSuccess({ event, tokenInfo });
     },
     'POST /logout': async ({ event }) => {
-        const { headers: { ['X-SC-ApiKey']: apiKey } } = event;
+        const apiKey = event.headers['x-sc-apikey'];
+
+        if (!apiKey) {
+            return logoutFailedResponse();
+        }
         
         const deletedKey = await deleteByApiKey({ apiKey });
 
@@ -71,13 +75,13 @@ async function spotifyAuthSuccess({ event, tokenInfo }) {
     return apiKeyResponse({ apiKey, userId: user.SpotifyUri });
 }
 
-function logoutSuccessResponse({ }) {
+function logoutSuccessResponse() {
     return {
         statusCode: 200,
     };
 }
 
-function logoutFailedResponse({ }) {
+function logoutFailedResponse() {
     return {
         statusCode: 401,
     };
