@@ -38,8 +38,10 @@ exports.deleteByApiKey = async ({ apiKey }) => {
         TableName: TABLE_NAME,
         Key: {
             'ApiKey': apiKey
-        }
-    }).promise();
+        },
+        ReturnValues: 'ALL_OLD'
+    }).promise()
+        .then(res => res.Attributes);
 }
 
 function generateApiKey({ user }) {

@@ -27,7 +27,18 @@ const routeHandlers = {
         log({ tokenInfo });
 
         return spotifyAuthSuccess({ event, tokenInfo });
-    }
+    },
+    'POST /logout': async ({ event }) => {
+        const { headers: { ['X-SC-ApiKey']: apiKey } } = event;
+        
+        const deletedKey = await deleteByApiKey({ apiKey });
+
+        if (!!deletedKey) {
+            return logoutSuccessResponse();
+        } else {
+            return logoutFailedResponse();
+        }
+    },
 }
 
 async function spotifyAuthSuccess({ event, tokenInfo }) {
@@ -58,6 +69,18 @@ async function spotifyAuthSuccess({ event, tokenInfo }) {
     log({ apiKey });
 
     return apiKeyResponse({ apiKey, userId: user.SpotifyUri });
+}
+
+function logoutSuccessResponse({ }) {
+    return {
+        statusCode: 200,
+    };
+}
+
+function logoutFailedResponse({ }) {
+    return {
+        statusCode: 401,
+    };
 }
 
 function apiKeyResponse({ apiKey, userId }) {

@@ -42,3 +42,16 @@ paths:
           description: Successfull login callback
         '5XX':
           description: Unsuccessfull login callback
+  /logout:
+    post:
+      x-amazon-apigateway-integration:
+        type: "AWS_PROXY"
+        httpMethod: "POST"
+        uri: "${integrationInvokeArn}"
+        payloadFormatVersion: "2.0"
+      summary: Logout
+      responses:
+        '200':
+          description: Successfully logout
+        '5XX':
+          description: Unsuccessfull logout attempt
