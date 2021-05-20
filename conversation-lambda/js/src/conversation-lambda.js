@@ -99,6 +99,7 @@ const eventErrorResponse = ({ status, errorMessage, context }) => ({ status, err
 const actionHandlers = {
     'GetConversations': async ({ event }) => {
         const { requestContext: { authorizer: { principalId: userUri } } } = event;
+        log({ userUri });
 
         const Conversations = await ConversationDataSource.findByUseryUri({ userUri });
         log({ Conversations });
@@ -110,7 +111,15 @@ const actionHandlers = {
 
         await sendToClients({ userUris: [userUri], messageContent: eventSuccessResponse({ action: 'Conversations', data: { conversations } }) });
     },
-    'GetMessages': async ({ event }) => { },
+    'GetMessages': async ({ event }) => {
+        const { requestContext: { authorizer: { principalId: userUri } }, body: { data: { conversation: conversationId } } } = event;
+        log({ userUri, conversationId });
+
+        const Conversation = await ConversationDataSource.getById({ conversationId });
+        log({ Conversation });
+
+        await sendToClients({ userUris: [userUri], messageContent: eventSuccessResponse({ action: 'ConversationMessages', data: { conversationId, messages: Conversation.Messages } }) });
+     },
     'SendMessage': async ({ event }) => {
         const { requestContext: { authorizer: { principalId: userUri } }, body: { data: { conversation: conversationId, message } } } = event;
         log({ userUri, conversationId, message });
