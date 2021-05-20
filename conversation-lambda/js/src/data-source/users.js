@@ -35,7 +35,7 @@ exports.getBySpotifyUri = async ({ spotifyUri }) => {
 exports.findBySpotifyUris = async ({ spotifyUris }) => {
     return dynamo.batchGet({ 
         RequestItems: { 
-            TABLE_NAME: { 
+            [TABLE_NAME]: { 
                 Keys: spotifyUris.map(uri => ({ SpotifyUri: uri })),
             },
         },
