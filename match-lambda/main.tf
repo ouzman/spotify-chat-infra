@@ -47,6 +47,7 @@ data "aws_iam_policy_document" "match_lambda_policy" {
       "dynamodb:UpdateItem",
       "dynamodb:Scan",
       "dynamodb:Query",
+      "dynamodb:BatchGetItem",
     ]
     resources = [
       var.users_db_table_arn,

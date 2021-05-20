@@ -7,20 +7,20 @@ const dynamo = new AWS.DynamoDB.DocumentClient();
 const TABLE_NAME = process.env.CONVERSATIONS_DB_TABLE_NAME
 
 
-exports.createConversation = async ({ song, users }) => {
+exports.createConversation = async ({ song, userUris }) => {
     return dynamo.update({
         TableName: TABLE_NAME,
         Key: { 'Id': generateId() },
-        UpdateExpression: 'SET #SONG=:song, #USERS=:users, #DATE=:date, #MSGS=:messages',
+        UpdateExpression: 'SET #SONG=:song, #UURIS=:userUris, #DATE=:date, #MSGS=:messages',
         ExpressionAttributeNames: {
             '#SONG': 'Song',
-            '#USERS': 'Users',
+            '#UURIS': 'UserUris',
             '#DATE': 'Date',
             '#MSGS': 'Messages',
         },
         ExpressionAttributeValues: {
             ':song': song,
-            ':users': users,
+            ':userUris': userUris,
             ':date': new Date().toISOString(),
             ':messages': [],
         },
@@ -65,11 +65,11 @@ exports.addNewMessage = async ({ conversationId, actorId, messageId, messageCont
 }
 
 exports.findByUseryUri = async ({ userUri }) => {
-    return dynamo.get({
+    return dynamo.scan({
         TableName: TABLE_NAME,
-        FilterExpression : 'contains(#USERS = :userUri)',
+        FilterExpression : 'contains(#UURIS, :userUri)',
         ExpressionAttributeNames: {
-            '#USERS': 'Users',
+            '#UURIS': 'UserUris',
         },
         ExpressionAttributeValues: {
             ':userUri': userUri,

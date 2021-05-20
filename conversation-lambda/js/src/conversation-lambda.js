@@ -52,13 +52,10 @@ const eventHandlers = {
 
         const song = songModel({ spotifySong });
 
-        const users = Users
-            .map(User => userModel({ User }))
-
-        const Conversation = await ConversationDataSource.createConversation({ song, users });
+        const Conversation = await ConversationDataSource.createConversation({ song, userUris });
         log({ Conversation })
 
-        await sendToClients({ userUris, messageContent: eventSuccessResponse({ action: 'NewConversation', data: { conversation: conversationModel({ Conversation }) } }) })
+        await sendToClients({ userUris, messageContent: eventSuccessResponse({ action: 'NewConversation', data: { conversation: conversationModel({ Conversation, Users }) } }) })
 
         return {
             status: 0,
@@ -105,8 +102,10 @@ const actionHandlers = {
 
         const Conversations = await ConversationDataSource.findByUseryUri({ userUri });
         log({ Conversations });
-        
-        let conversations = Conversations.map(Conversation => conversationModel({ Conversation }));
+
+        const conversationPromises = Conversations.map(async (Conversation) => conversationModel({ Conversation, Users: await UsersDataSource.findBySpotifyUris({ spotifyUris: Conversation.UserUris }) }));
+
+        const conversations = await Promise.all(conversationPromises);
         log({ conversations });
 
         await sendToClients({ userUris: [userUri], messageContent: eventSuccessResponse({ action: 'Conversations', data: { conversations } }) });
@@ -132,7 +131,7 @@ const actionHandlers = {
             return
         }
 
-        const userBelongsToConversation = Conversation.Users.map(user => user.id).includes(userUri);
+        const userBelongsToConversation = Conversation.UserUris.includes(userUri);
         if (!userBelongsToConversation) {
             log({ message: 'User doesn\'t belong to the conversation', userUri, Conversation });
             return
@@ -142,9 +141,7 @@ const actionHandlers = {
 
         const persistedMessage = await ConversationDataSource.addNewMessage({ conversationId, actorId: userUri, messageId, messageContent });
 
-        const userUris = Conversation.Users.map(u => u.id);
-
-        await sendToClients({ userUris, messageContent: eventSuccessResponse({ action: 'NewMessage', data: { conversationId, message: persistedMessage } }) });
+        await sendToClients({ userUris: Conversation.UserUris, messageContent: eventSuccessResponse({ action: 'NewMessage', data: { conversationId, message: persistedMessage } }) });
     },
     'DismissConversation': async ({ event }) => { },
 }
@@ -162,10 +159,10 @@ const userModel = ({ User }) => ({
     profilePhotoUrl: User.ImageUrl,
 });
 
-const conversationModel = ({ Conversation }) => ({
+const conversationModel = ({ Conversation, Users }) => ({
     id: Conversation.Id,
     song: Conversation.Song,
-    users: Conversation.Users,
+    users: Users.map(User => userModel({ User })),
     date: Conversation.Date,
     lastMessage: Conversation.Messages.reduce((acc, message) => acc > new Date(message.date) ? acc : message, new Date(0)),
 });

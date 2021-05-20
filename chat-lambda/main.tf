@@ -48,6 +48,7 @@ data "aws_iam_policy_document" "chat_lambda_policy" {
       "dynamodb:UpdateItem",
       "dynamodb:Scan",
       "dynamodb:Query",
+      "dynamodb:BatchGetItem",
     ]
     resources = [
       var.connections_db_table_arn,
