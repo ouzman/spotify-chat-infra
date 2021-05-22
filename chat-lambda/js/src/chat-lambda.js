@@ -31,7 +31,6 @@ const routeHandlers = {
             } catch (error) {
                 log({ error });
             }    
-            // TODO: dismiss active conversations
         }
 
         await createConnection({ connectionId, userUri });
@@ -40,8 +39,6 @@ const routeHandlers = {
         const { connectionId, authorizer: { principalId: userUri } } = event.requestContext;
 
         const connection = await getByConnectionId({ connectionId });
-
-        // TODO: dismiss active conversation
 
         await deleteByConnectionId({ connectionId });
     },
