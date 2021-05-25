@@ -173,7 +173,7 @@ const conversationModel = ({ Conversation, Users }) => ({
     song: Conversation.Song,
     users: Users.map(User => userModel({ User })),
     date: Conversation.Date,
-    lastMessage: Conversation.Messages.sort((m1, m2) => m2.date - m1.date)[0] || null,
+    lastMessage: Conversation.Messages.sort((m1, m2) => new Date(m2.date) - new Date(m1.date))[0] || null,
 });
 
 const messageModel = ({ id, actorId, content, date }) => ({ id, actorId, content, date });
